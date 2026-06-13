@@ -8,25 +8,24 @@ Legenda priorit: **P0** = MVP jádro, **P1** = rozšíření, **P2** = pozdějš
 
 ## 1. Účty (Accounts)
 - Neomezený počet účtů: hotovost, běžný účet, kreditka, spoření, investice, voucher/klubová karta. **P0**
-- Atributy: název, typ, měna, počáteční zůstatek, barva, ikona. **P0**
+- Atributy: název, typ, počáteční zůstatek, ikona. **P0** (měna vždy CZK; bez barev — monochrom)
 - Vyloučit účet ze statistik / z čistého jmění. **P0**
 - Archivace účtu (skrýt, ale zachovat historii). **P1**
 - Aktuální zůstatek = počáteční ± transakce (počítá appka). **P0**
-- Celkové čisté jmění napříč účty (přepočet do výchozí měny). **P0**
+- Celkové čisté jmění napříč účty (jednotná měna CZK, bez přepočtu). **P0**
 
 ## 2. Transakce / Záznamy (Records)
 - Typy: **příjem, výdaj, převod** mezi účty. **P0**
 - Pole: částka, kategorie, účet, datum a čas, protistrana/příjemce (payee), poznámka,
-  štítky, platební metoda, foto účtenky, lokalita (GPS). **P0** (foto/GPS **P1**)
+  platební metoda. **P0**
 - Převod = jedna operace propojující dva účty (případně s poplatkem). **P0**
 - Šablony pro rychlé opakované zadání. **P1**
-- Rozdělení transakce (split) do více kategorií. **P2**
-- Filtrování (účet, kategorie, typ, období, štítek, částka) a fulltext hledání. **P0**
+- Filtrování (účet, kategorie, typ, období, částka). **P0**
 - Seskupení v seznamu po dnech, se součty. **P0**
 
 ## 3. Kategorie (Categories)
 - Přednastavená sada kategorií + podkategorií (Jídlo, Doprava, Bydlení, Zábava…). **P0**
-- Vlastní kategorie s ikonou, barvou a typem (příjem/výdaj). **P0**
+- Vlastní kategorie s ikonou a typem (příjem/výdaj); bez barvy (monochrom). **P0**
 - Nadřazené kategorie / skupiny (super-categories). **P1**
 - Automatická kategorizace (u Fio importu pravidlovým enginem). **P0** (pro Fio)
 
@@ -39,7 +38,7 @@ Legenda priorit: **P0** = MVP jádro, **P1** = rozšíření, **P2** = pozdějš
 
 ## 5. Reporty a analýzy (Reports / Cash Flow)
 - Cash flow: příjmy vs. výdaje v čase (sloupcový graf). **P0**
-- Výdaje podle kategorií (koláč/donut) s drill-down. **P0**
+- Výdaje podle kategorií — **monochromatický žebříček/pruhy** (místo barevného koláče) s drill-down. **P0**
 - Vývoj zůstatku / čistého jmění v čase (spojnice). **P0**
 - Srovnání období (tento vs. minulý měsíc). **P1**
 - Volba období (měsíc/rok/vlastní rozsah) a filtr účtů. **P0**
@@ -47,53 +46,32 @@ Legenda priorit: **P0** = MVP jádro, **P1** = rozšíření, **P2** = pozdějš
 ## 6. Plánované / opakované platby (Planned Payments)
 - Opakované příjmy/výdaje (nájem, předplatné, výplata). **P1**
 - Frekvence (denně/týdně/měsíčně/ročně/vlastní), datum příště, konec. **P1**
-- Připomínka X dní předem; volitelně automatické vytvoření transakce. **P1**
 - Přehled nadcházejících plateb na dashboardu. **P1**
 
-## 7. Dluhy (Debts)
-- Dvě strany: **dlužím** / **dluží mi**. **P1**
-- Pole: osoba, částka, měna, datum, splatnost, poznámka. **P1**
-- Částečné splátky; stav vyrovnáno. **P1**
-- Připomínka splatnosti. **P1**
+## 7. Měna (Currency)
+- Jednotná měna celé aplikace: **CZK**. Žádné přepočty ani kurzy. **P0**
+- Více měn a kurzy nejsou v plánu (vědomé zjednodušení pro českého uživatele).
 
-## 8. Spořicí cíle (Goals)
-- Cílová částka, termín, navázaný účet, ikona/barva. **P1**
-- Příspěvky a průběh (% naspořeno). **P1**
-
-## 9. Nákupní seznamy (Shopping Lists)
-- Více seznamů, položky se zaškrtáváním, volitelně cena a množství. **P1**
-- Převod nakoupeného seznamu na výdajovou transakci. **P1**
-
-## 10. Záruční karty (Warranties)
-- Evidence záruk: produkt, značka, datum nákupu, délka záruky, expirace, foto. **P1**
-- Připomínka před koncem záruky. **P1**
-
-## 11. Měny (Currencies)
-- Více měn, výchozí (základní) měna, přepočet zůstatků a reportů. **P1**
-- Kurzy (manuální + aktualizace z online zdroje). **P1**
-
-## 12. Bankovní synchronizace (Bank Sync) — Fio
+## 8. Bankovní synchronizace (Bank Sync) — Fio
 - Připojení Fio účtu read-only tokenem. **P0**
 - Automatické stahování pohybů na pozadí (WorkManager). **P0**
 - Deduplikace, párování do kategorií, aktualizace zůstatku. **P0**
 - Detail v [04-fio-konektor.md](04-fio-konektor.md). **P0**
 
-## 13. Zabezpečení (Security)
-- Zámek appky: PIN / biometrie (otisk, obličej). **P0**
+## 9. Zabezpečení (Security)
 - Šifrované uložení Fio tokenu (Keystore / EncryptedSharedPreferences). **P0**
 
-## 14. Widgety a notifikace
-- Domovský widget: rychlé přidání + přehled zůstatku/rozpočtu. **P1**
-- Notifikace: připomínky plateb, překročení rozpočtu, dokončený Fio sync. **P0/P1**
+## 10. Upozornění (vizuální)
+- Stav rozpočtu přímo v UI (naplněnost pruhu + `⚠` při překročení). **P0**
+- **Žádné push notifikace ani připomínky** (vědomě neděláme).
 
-## 15. Import / Export
-- Export dat do CSV; import transakcí z CSV. **P1**
-- Záloha/obnova celé databáze (lokální soubor). **P1**
+## 11. Záloha dat
+- Záloha/obnova celé databáze do lokálního souboru. **P1**
 
-## 16. Onboarding a nastavení
-- Úvodní průvodce: výběr výchozí měny, vytvoření prvního účtu. **P0**
-- Nastavení: měny, zabezpečení, notifikace, první den týdne/měsíce, motiv, jazyk,
-  správa kategorií/štítků/šablon, data (export/import), o aplikaci. **P0**
+## 12. Onboarding a nastavení
+- Úvodní průvodce: vytvoření prvního účtu (měna je vždy CZK). **P0**
+- Nastavení: první den týdne/měsíce,
+  správa kategorií/šablon, záloha/obnova dat, o aplikaci. **P0** (UI jen česky)
 
-## 17. Cloud / sdílení (pozdější fáze)
-- Cloud sync mezi zařízeními, web app, sdílené účty (rodina). **P2**
+## 13. Cloud (pozdější fáze)
+- Volitelná cloud záloha / sync mezi vlastními zařízeními. **P2**

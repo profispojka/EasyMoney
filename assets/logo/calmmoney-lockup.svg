@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="96" viewBox="0 0 360 96" fill="none">
+  <!-- Horizontální logo: značka + nápis. "Calm" tučně, "Money" lehčeji (klid + důraz). -->
+  <circle cx="48" cy="48" r="30" fill="none" stroke="#000000" stroke-width="5.5"/>
+  <path d="M30 48 C35 39 43 39 48 48 C53 57 61 57 66 48"
+        fill="none" stroke="#000000" stroke-width="5.5" stroke-linecap="round"/>
+  <text x="100" y="61" font-family="Inter, Helvetica, Arial, sans-serif" font-size="40" fill="#000000">
+    <tspan font-weight="700">Calm</tspan><tspan font-weight="400">Money</tspan>
+  </text>
+</svg>

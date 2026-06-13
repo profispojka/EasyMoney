@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CalmMoney</string>
+
+    <!-- Spodní navigace -->
+    <string name="nav_dashboard">Přehled</string>
+    <string name="nav_records">Záznamy</string>
+    <string name="nav_planned">Platby</string>
+    <string name="nav_budgets">Rozpočty</string>
+    <string name="nav_statistics">Statistiky</string>
+    <string name="nav_more">Více</string>
+    <string name="action_add_record">Přidat záznam</string>
+
+    <!-- Obrazovky (placeholdery Fáze 0) -->
+    <string name="dashboard_title">Přehled</string>
+    <string name="records_title">Záznamy</string>
+    <string name="budgets_title">Rozpočty</string>
+    <string name="more_title">Více</string>
+    <string name="add_record_title">Nový záznam</string>
+
+    <!-- Prázdné stavy -->
+    <string name="empty_dashboard_title">Zatím prázdno</string>
+    <string name="empty_dashboard_subtitle">Přidej první záznam tlačítkem +.</string>
+    <string name="empty_records_title">Žádné záznamy</string>
+    <string name="empty_records_subtitle">Příjmy a výdaje se objeví tady.</string>
+    <string name="empty_budgets_title">Žádné rozpočty</string>
+    <string name="empty_budgets_subtitle">Vytvoř rozpočet a sleduj čerpání.</string>
+
+    <string name="action_close">Zavřít</string>
+    <string name="placeholder_screen">Obrazovka se připravuje (Fáze 0 – kostra).</string>
+</resources>

@@ -5,8 +5,9 @@ sync (každá entita má `id` typu UUID/String, `createdAt`, `updatedAt`, příz
 pro budoucí soft-delete sync).
 
 ## Zásady pro peníze a čas
-- **Částky:** `amountMinor: Long` (haléře/centy) + `currency: String` (ISO 4217).
-  Nikdy `float`/`double`. Výpočty přes `BigDecimal`, formátování přes `NumberFormat`.
+- **Částky:** `amountMinor: Long` (haléře). Měna je vždy **CZK** — neukládá se
+  do entit, žádné přepočty ani kurzy. Nikdy `float`/`double`. Výpočty přes
+  `BigDecimal`, formátování přes `NumberFormat` (locale `cs-CZ`).
 - **Čas:** ukládat jako epoch millis (UTC) + při zobrazení lokální zóna. Datum-only
   pole (splatnost) jako `LocalDate` (ISO string).
 
@@ -18,10 +19,8 @@ pro budoucí soft-delete sync).
 | id | String (UUID) | PK |
 | name | String | |
 | type | enum | CASH, CHECKING, CREDIT_CARD, SAVINGS, INVESTMENT, OTHER |
-| currency | String | ISO 4217 |
-| initialBalanceMinor | Long | počáteční zůstatek |
-| color | Int | ARGB |
-| icon | String | klíč ikony |
+| initialBalanceMinor | Long | počáteční zůstatek (CZK) |
+| icon | String | klíč ikony (monochrom, bez barvy) |
 | excludeFromStats | Boolean | |
 | archived | Boolean | |
 | sortOrder | Int | |
@@ -37,8 +36,7 @@ pro budoucí soft-delete sync).
 | name | String | |
 | type | enum | INCOME, EXPENSE |
 | parentId | String? | podkategorie |
-| color | Int | |
-| icon | String | |
+| icon | String | monochrom, bez barvy |
 | sortOrder | Int | |
 | isDefault | Boolean | z přednastavené sady |
 
@@ -49,14 +47,11 @@ pro budoucí soft-delete sync).
 | type | enum | EXPENSE, INCOME, TRANSFER |
 | accountId | String | FK → Account |
 | categoryId | String? | FK → Category (null u převodu) |
-| amountMinor | Long | u výdaje záporné? → viz pozn. |
-| currency | String | měna účtu |
+| amountMinor | Long | u výdaje záporné? → viz pozn. (CZK) |
 | dateTime | Long | epoch millis |
 | payee | String? | příjemce/plátce |
 | note | String? | |
 | paymentType | enum? | CASH, CARD, TRANSFER, OTHER |
-| photoUri | String? | *P1* |
-| latitude / longitude | Double? | *P1* |
 | transferAccountId | String? | druhý účet u převodu |
 | transferRecordId | String? | spárovaný protizáznam |
 | plannedPaymentId | String? | původ z plánované platby |
@@ -70,47 +65,27 @@ pro budoucí soft-delete sync).
 > **Převod:** modelován jako 2 propojené Record (odchozí na účtu A, příchozí na účtu B)
 > přes `transferRecordId`, nebo jako 1 Record s `transferAccountId`. Volba ovlivní reporty.
 
-### Label / RecordLabelCrossRef *(P1)*
-- `Label(id, name, color)`
-- `RecordLabelCrossRef(recordId, labelId)` — M:N.
-
 ### Budget
 | pole | typ | pozn. |
 |---|---|---|
 | id, name | | |
 | categoryIds | List<String> | serializované / přes cross-ref |
-| amountMinor, currency | | limit |
+| amountMinor | | limit (CZK) |
 | period | enum | WEEK, MONTH, YEAR, CUSTOM |
 | startDate | LocalDate | |
 | rollover | Boolean | *P1* |
 | notifyThresholdPct | Int | např. 80 |
 
-### PlannedPayment *(P1)*
-- type, accountId, categoryId, amountMinor, currency, payee, note,
-  frequency(enum DAILY/WEEKLY/MONTHLY/YEARLY/CUSTOM), nextDate, endDate,
-  autoCreate(Boolean), reminderDaysBefore(Int).
-
-### Debt *(P1)*
-- `Debt(id, direction[OWE/OWED], personName, amountMinor, currency, date, dueDate, note, accountId?, settled)`
-- `DebtPayment(id, debtId, amountMinor, date)`.
-
-### Goal *(P1)*
-- `Goal(id, name, targetAmountMinor, currency, deadline, accountId?, icon, color)`
-- `GoalContribution(id, goalId, amountMinor, date)`.
-
-### ShoppingList / ShoppingItem *(P1)*
-- `ShoppingList(id, name, createdAt)`
-- `ShoppingItem(id, listId, name, quantity, priceMinor?, checked)`.
-
-### Warranty *(P1)*
-- `Warranty(id, productName, brand?, purchaseDate, warrantyMonths, expiryDate, photoUri?, note?, reminderEnabled)`.
+### PlannedPayment
+- `id, name, type (EXPENSE/INCOME), accountId, categoryId?, amountMinor, note?`
+- Frekvence obecně: `frequencyUnit (DAY/WEEK/MONTH/YEAR) + frequencyCount` (např. 2× ročně = MONTH×6).
+- `startEpochDay` (kotva/první výskyt), `endEpochDay?` (volitelný konec).
+- Bez připomínek a bez auto-vytváření záznamu (vědomě). „Zaplatit teď“ vytvoří reálný záznam ručně.
 
 ### Template *(P1)*
 - `Template(id, name, type, accountId, categoryId, amountMinor?, payee?, note?)`.
 
-### Currency / ExchangeRate *(P1)*
-- `Currency(code, symbol, decimalDigits)`
-- `ExchangeRate(code, rateToBase, updatedAt)`; výchozí měna v nastavení.
+> **Měna:** aplikace je jednoměnová (CZK). Žádné entity pro měny ani kurzy.
 
 ### FioConnection
 | pole | typ | pozn. |
@@ -133,19 +108,14 @@ pro budoucí soft-delete sync).
 - `Rule(id, matchField[PAYEE/NOTE/VS/COUNTER_ACCOUNT], operator[CONTAINS/EQUALS], value, categoryId, priority)`.
 
 ### Settings (DataStore, ne Room)
-- baseCurrency, language, theme, firstDayOfWeek, firstDayOfMonth,
-  appLockEnabled, lockType, onboardingDone, notif flags.
+- theme, firstDayOfWeek, firstDayOfMonth, onboardingDone, notif flags.
 
 ## Vztahy (zjednodušeně)
 
 ```
 Account 1───* Record *───1 Category
 Account 1───* FioConnection
-Record  *───* Label
 Budget  *───* Category
-Debt    1───* DebtPayment
-Goal    1───* GoalContribution
-ShoppingList 1───* ShoppingItem
 ```
 
 ## Indexy a výkon
@@ -156,4 +126,4 @@ ShoppingList 1───* ShoppingItem
 
 ## Migrace a zálohy
 - Verzované Room migrace.
-- Záloha = export celé DB + nastavení do souboru (sdílení/obnova). *(P1)*
+- Lokální záloha/obnova = export celé DB + nastavení do souboru a zpětné načtení. *(P1)*

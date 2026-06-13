@@ -130,7 +130,9 @@ Base: `https://fioapi.fio.cz/v1/rest/`
   („Nezařazeno“) — uživatel dořeší.
 - **Source:** `FIO` (badge v UI, nejde upravit částka/datum, aby seděl zůstatek;
   kategorii/poznámku upravit lze).
-- **Měna ≠ měna účtu:** uložit původní měnu; přepočet do reportů řeší kurz (*P1*).
+- **Měna:** aplikace je jednoměnová (CZK). Pohyby v jiné měně než CZK se
+  importují podle částky zaúčtované na účtu (Fio účtuje v CZK); pole `column14`
+  z Fio se nepoužívá pro přepočet.
 
 ## 9. Automatická kategorizace *(P1)*
 - Jednoduchý **pravidlový engine** (`CategorizationRule`): podmínka nad

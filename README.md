@@ -1,6 +1,6 @@
-# Money — osobní finanční tracker (Wallet klon)
+# CalmMoney — osobní finanční tracker
 
-Android aplikace pro sledování příjmů a výdajů, postavená jako věrná kopie funkcí
+Android aplikace pro sledování příjmů a výdajů, inspirovaná funkcemi
 **Wallet by BudgetBakers** ([budgetbakers.com](https://budgetbakers.com/en/products/wallet/)),
 rozšířená o **konektor na Fio banku** (automatický import transakcí).
 
@@ -8,14 +8,23 @@ rozšířená o **konektor na Fio banku** (automatický import transakcí).
 
 | Oblast | Volba |
 |---|---|
+| Název / package | **CalmMoney** · `cz.calmmoney` |
 | Platforma | **Android, nativně** |
-| Jazyk / UI | **Kotlin + Jetpack Compose (Material 3)** |
+| Jazyk / UI | **Kotlin + Jetpack Compose (Material 3, přebarvené na monochrom)** |
+| Vzhled | **Černobílý E-Ink** — monochrom, vysoký kontrast, bez animací ([docs/08](docs/08-design-eink.md)) |
+| Cílové zařízení | **Mudita Kompakt** (E-Ink Android) — potvrzeno |
 | Data | **Offline-first** (vše lokálně v telefonu), cloud sync až v pozdější fázi |
 | Banka | **Fio banka — pouze import transakcí** (read-only token, žádné odchozí platby) |
 
-## Tento adresář = plán, ne kód
+## Stav: založen projekt (Fáze 0)
 
-Zatím jde **čistě o plán** k odsouhlasení. Žádný kód se nepíše, dokud neschválíš směr.
+V `docs/` je kompletní plán, v kořeni je **Android projekt** (`cz.calmmoney`) — kostra
+appky, monochromatický E-Ink design system a navigace. Logo v `assets/logo/`.
+
+> ⚠️ Projekt zatím **nebyl zkompilován** (prostředí nemá JDK ani Android SDK).
+> Otevři kořen `Money/` v **Android Studiu** (doplní SDK) nebo sestav přes
+> `./gradlew :app:assembleDebug` (vyžaduje JDK 17 + Android SDK).
+> Detail a další kroky v [docs/09-stav-projektu.md](docs/09-stav-projektu.md).
 
 ## Mapa dokumentů
 
@@ -29,9 +38,10 @@ Zatím jde **čistě o plán** k odsouhlasení. Žádný kód se nepíše, dokud
 | [docs/05-architektura.md](docs/05-architektura.md) | Tech stack, vrstvy, knihovny, struktura projektu |
 | [docs/06-roadmap.md](docs/06-roadmap.md) | Fáze vývoje a milníky |
 | [docs/07-otevrene-otazky.md](docs/07-otevrene-otazky.md) | Otázky a rozhodnutí k odsouhlasení |
+| [docs/08-design-eink.md](docs/08-design-eink.md) | **Vizuální styl: černobílý E-Ink** (tokeny, typografie, grafy, interakce) |
+| [docs/09-stav-projektu.md](docs/09-stav-projektu.md) | **Stav kódu** — co je v Fázi 0 hotové a jak projekt sestavit |
 
 ## Další krok
 
-Projdi prosím hlavně [docs/00-prehled-a-rozsah.md](docs/00-prehled-a-rozsah.md),
-[docs/02-obrazovky.md](docs/02-obrazovky.md) a [docs/07-otevrene-otazky.md](docs/07-otevrene-otazky.md).
-Pak doladíme rozsah MVP a začneme zakládat projekt podle [docs/06-roadmap.md](docs/06-roadmap.md).
+Otevřít projekt v Android Studiu a ověřit build, pak **Fáze 1** (přednastavené kategorie,
+onboarding, formulář transakce, napojení dashboardu na DB) dle [docs/06-roadmap.md](docs/06-roadmap.md).
