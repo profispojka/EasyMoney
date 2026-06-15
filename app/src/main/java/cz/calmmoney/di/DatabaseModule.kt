@@ -35,13 +35,21 @@ object DatabaseModule {
                     super.onDestructiveMigration(db)
                     seedCategories(db)
                 }
+
+                // Doplní kategorie přidané po v5 (např. „Práce / Podnikání") i do existující DB.
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    insertCategories(db, DefaultCategories.extras())
+                }
             })
             // Dev: při změně schématu DB znovu vytvoř (před vydáním, žádná reálná data).
             .fallbackToDestructiveMigration()
             .build()
 
-    private fun seedCategories(db: SupportSQLiteDatabase) {
-        DefaultCategories.all().forEach { c ->
+    private fun seedCategories(db: SupportSQLiteDatabase) = insertCategories(db, DefaultCategories.all())
+
+    private fun insertCategories(db: SupportSQLiteDatabase, categories: List<cz.calmmoney.data.db.CategoryEntity>) {
+        categories.forEach { c ->
             db.execSQL(
                 "INSERT OR IGNORE INTO categories (id, name, type, parentId, icon, sortOrder, isDefault) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)",

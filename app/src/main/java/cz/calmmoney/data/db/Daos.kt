@@ -46,6 +46,8 @@ interface AccountDao {
           (SELECT IFNULL(SUM(initialBalanceMinor), 0) FROM accounts WHERE excludeFromStats = 0 AND archived = 0)
           + (SELECT IFNULL(SUM(CASE WHEN type = 'INCOME' THEN amountMinor
                                     WHEN type = 'EXPENSE' THEN -amountMinor
+                                    WHEN type = 'TRANSFER' AND transferOut = 0 THEN amountMinor
+                                    WHEN type = 'TRANSFER' AND transferOut = 1 THEN -amountMinor
                                     ELSE 0 END), 0)
              FROM records
              WHERE accountId IN (SELECT id FROM accounts WHERE excludeFromStats = 0 AND archived = 0))
@@ -133,6 +135,10 @@ interface RecordDao {
 
     @Query("SELECT * FROM records WHERE id = :id")
     suspend fun getById(id: String): RecordEntity?
+
+    /** Nezařazené příjmy/výdaje (bez kategorie) — pro dávkovou kategorizaci. */
+    @Query("SELECT * FROM records WHERE categoryId IS NULL AND type IN ('EXPENSE', 'INCOME')")
+    suspend fun getUncategorized(): List<RecordEntity>
 
     /** Idempotentní vložení Fio záznamu (dedup přes unikátní fioTransactionId). */
     @Insert(onConflict = OnConflictStrategy.IGNORE)

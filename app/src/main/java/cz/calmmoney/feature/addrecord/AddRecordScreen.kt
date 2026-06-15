@@ -49,6 +49,7 @@ import cz.calmmoney.data.db.CategoryEntity
 import cz.calmmoney.data.db.CategoryType
 import cz.calmmoney.data.db.RecordType
 import cz.calmmoney.data.repo.AccountRepository
+import cz.calmmoney.data.repo.CategorizationRepository
 import cz.calmmoney.data.repo.CategoryRepository
 import cz.calmmoney.data.repo.RecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -88,16 +89,22 @@ data class AddRecordUiState(
         }
 }
 
+data class PendingSiblings(val categoryId: String, val payee: String, val count: Int)
+
 @HiltViewModel
 class AddRecordViewModel @Inject constructor(
     accountsRepo: AccountRepository,
     categoriesRepo: CategoryRepository,
     private val records: RecordRepository,
+    private val categorization: CategorizationRepository,
     savedStateHandle: androidx.lifecycle.SavedStateHandle,
 ) : ViewModel() {
 
     private val editingId: String? = savedStateHandle.get<String>("recordId")
     val isEditing: Boolean get() = editingId != null
+
+    private val _pendingSiblings = MutableStateFlow<PendingSiblings?>(null)
+    val pendingSiblings: StateFlow<PendingSiblings?> = _pendingSiblings
 
     private data class Form(
         val type: RecordType = RecordType.EXPENSE,
@@ -106,6 +113,7 @@ class AddRecordViewModel @Inject constructor(
         val toAccountId: String? = null,
         val categoryId: String? = null,
         val note: String = "",
+        val payee: String? = null,
         val dateTimeMillis: Long = System.currentTimeMillis(),
     )
 
@@ -122,6 +130,7 @@ class AddRecordViewModel @Inject constructor(
                         accountId = r.accountId,
                         categoryId = r.categoryId,
                         note = r.note ?: "",
+                        payee = r.payee,
                         dateTimeMillis = r.dateTime,
                     )
                 }
@@ -172,6 +181,7 @@ class AddRecordViewModel @Inject constructor(
                     categoryId = s.selectedCategoryId,
                     amountMinor = s.amountMinor,
                     dateTime = s.dateTimeMillis,
+                    payee = form.value.payee,
                     note = s.note,
                 )
                 s.type == RecordType.TRANSFER -> records.addTransfer(
@@ -190,8 +200,32 @@ class AddRecordViewModel @Inject constructor(
                     note = s.note,
                 )
             }
+            // Po ručním zařazení záznamu s obchodníkem nabídni „použít na všechny stejné".
+            val payee = form.value.payee
+            val cat = s.selectedCategoryId
+            if (id != null && cat != null && !payee.isNullOrBlank()) {
+                val count = categorization.countUncategorizedForMerchant(payee)
+                if (count > 0) {
+                    _pendingSiblings.value = PendingSiblings(cat, payee, count)
+                    return@launch
+                }
+            }
             onDone()
         }
+    }
+
+    fun applySiblings(onDone: () -> Unit) {
+        val p = _pendingSiblings.value ?: return onDone()
+        viewModelScope.launch {
+            categorization.applyToMerchant(p.payee, p.categoryId)
+            _pendingSiblings.value = null
+            onDone()
+        }
+    }
+
+    fun skipSiblings(onDone: () -> Unit) {
+        _pendingSiblings.value = null
+        onDone()
     }
 }
 
@@ -211,6 +245,7 @@ fun AddRecordScreen(
     vm: AddRecordViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
+    val pending by vm.pendingSiblings.collectAsStateWithLifecycle()
 
     LaunchedEffect(pickedCategoryId) {
         if (pickedCategoryId != null) {
@@ -329,6 +364,19 @@ fun AddRecordScreen(
                 }) { Text("OK") }
             },
             dismissButton = { TextButton(onClick = { showTime = false }) { Text("Zrušit") } },
+        )
+    }
+
+    pending?.let { p ->
+        val catName = state.categories.firstOrNull { it.id == p.categoryId }?.name ?: "tuhle kategorii"
+        AlertDialog(
+            onDismissRequest = { vm.skipSiblings(onClose) },
+            title = { Text("Použít na všechny stejné?") },
+            text = {
+                Text("Máš ještě ${p.count} nezařazených plateb od „${p.payee}“. Zařadit je taky jako „$catName“?")
+            },
+            confirmButton = { TextButton(onClick = { vm.applySiblings(onClose) }) { Text("Použít na všechny") } },
+            dismissButton = { TextButton(onClick = { vm.skipSiblings(onClose) }) { Text("Jen tuhle") } },
         )
     }
 }

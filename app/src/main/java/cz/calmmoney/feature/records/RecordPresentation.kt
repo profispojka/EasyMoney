@@ -19,25 +19,40 @@ fun RecordEntity.toRowUi(
     accounts: Map<String, AccountEntity>,
 ): RecordRowUi {
     val category = categoryId?.let { categories[it] }
+    val accountName = accounts[accountId]?.name
     return when (type) {
         RecordType.EXPENSE -> RecordRowUi(
             id = id,
             iconKey = category?.icon ?: "more_horiz",
-            title = category?.name ?: payee ?: "Bez kategorie",
-            subtitle = note ?: accounts[accountId]?.name,
+            // Titulek = obchodník; pod ním kategorie · účet. U ručních (bez plátce) titulek = kategorie.
+            title = payee ?: category?.name ?: "Bez kategorie",
+            subtitle = if (payee != null) {
+                listOfNotNull(category?.name ?: "Bez kategorie", accountName).joinToString(" · ")
+            } else {
+                note ?: accountName
+            },
             amountMinor = -amountMinor,
         )
         RecordType.INCOME -> RecordRowUi(
             id = id,
             iconKey = category?.icon ?: "payments",
-            title = category?.name ?: payee ?: "Příjem",
-            subtitle = note ?: accounts[accountId]?.name,
+            title = payee ?: category?.name ?: "Příjem",
+            subtitle = if (payee != null) {
+                listOfNotNull(category?.name ?: "Bez kategorie", accountName).joinToString(" · ")
+            } else {
+                note ?: accountName
+            },
             amountMinor = amountMinor,
         )
         RecordType.TRANSFER -> {
             val here = accounts[accountId]?.name ?: "?"
-            val there = accounts[transferAccountId]?.name ?: "?"
-            val subtitle = if (transferOut == true) "$here → $there" else "$there → $here"
+            // Fio import je jednostranný (bez protiúčtu) — ukaž plátce / poznámku.
+            val subtitle = if (transferAccountId == null) {
+                payee ?: note ?: here
+            } else {
+                val there = accounts[transferAccountId]?.name ?: "?"
+                if (transferOut == true) "$here → $there" else "$there → $here"
+            }
             RecordRowUi(
                 id = id,
                 iconKey = "more_horiz",

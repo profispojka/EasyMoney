@@ -208,7 +208,10 @@ class PlannedPaymentRepository @Inject constructor(
 }
 
 @Singleton
-class RecordRepository @Inject constructor(private val dao: RecordDao) {
+class RecordRepository @Inject constructor(
+    private val dao: RecordDao,
+    private val categorization: CategorizationRepository,
+) {
 
     fun observeAll(): Flow<List<RecordEntity>> = dao.observeAll()
     fun observeRecent(limit: Int): Flow<List<RecordEntity>> = dao.observeRecent(limit)
@@ -241,6 +244,7 @@ class RecordRepository @Inject constructor(private val dao: RecordDao) {
                 updatedAt = ts,
             )
         )
+        categorization.learn(payee, categoryId)
     }
 
     /** Převod mezi účty = dva propojené záznamy (odchozí + příchozí). */
@@ -298,6 +302,7 @@ class RecordRepository @Inject constructor(private val dao: RecordDao) {
                 updatedAt = now(),
             )
         )
+        categorization.learn(payee, categoryId)
     }
 
     suspend fun delete(record: RecordEntity) = dao.delete(record)

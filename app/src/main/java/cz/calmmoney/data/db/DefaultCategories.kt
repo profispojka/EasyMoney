@@ -140,6 +140,32 @@ object DefaultCategories {
             Triple("missing", "Chybějící", "help_outline"),
         ))
 
+        list += extras()
         return list
     }
+
+    /**
+     * Kategorie přidané po v5 seedu. Vkládají se i do existující DB (INSERT OR IGNORE
+     * při otevření), takže nevyžadují destruktivní migraci / mazání dat.
+     */
+    fun extras(): List<CategoryEntity> = listOf(
+        CategoryEntity(
+            id = "work",
+            name = "Práce / Podnikání",
+            type = CategoryType.EXPENSE,
+            parentId = null,
+            icon = "business_center",
+            sortOrder = 950,
+            isDefault = true,
+        ),
+        CategoryEntity(
+            id = "cash_withdrawal",
+            name = "Výběr hotovosti",
+            type = CategoryType.EXPENSE,
+            parentId = null,
+            icon = "local_atm",
+            sortOrder = 951,
+            isDefault = true,
+        ),
+    )
 }

@@ -39,6 +39,15 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   **Ověřeno naživo** (424 transakcí za 90 dní, součty sedí). Pozn.: Fio bez silné autorizace dá
   jen data ne starší **90 dní** (proto okno 90 dní; starší historie přes autorizaci v IB).
   (PSD2 cesta jako Wallet nejde — chce vlastní AISP licenci od ČNB.)
+- **Detekce trvalých příkazů** (`core/recurring`) — Fio API je nevystavuje, tak je odvozujeme z
+  historie (stejná částka + měsíční kadence). Více → Fio → „Najít opakované platby" → seznam návrhů
+  s auto-kategorií → potvrzené se založí jako **měsíční plánované platby** (objeví se v „Nadcházející
+  platby"). Ověřeno: našlo 7 reálných (hypotéka, byt-služby, Zonky, ČEZ, pojištění, dar).
+- **Automatická kategorizace** (`core/categorize`) — obecný rule engine: normalizace obchodníka →
+  **naučená pravidla** (z toho, jak sám zařazuješ; uložená v DataStore) → **seed slovník** (CZ/PL
+  obchodníci) → heuristiky. **Vlastní převody** (protistrana = majitel účtu) jdou jako TRANSFER mimo
+  statistiky; nová kategorie **„Práce / Podnikání"**. Při importu zařadí ~⅔ automaticky, zbytek se
+  doučí; tlačítko „Překategorizovat nezařazené". Ověřeno naživo na 424 transakcích.
 - **Záloha / obnova dat** (Více → Záloha dat) — export celé SQLite DB do souboru přes systémový
   dialog (SAF, žádná oprávnění navíc), obnova soubor ověří (`SQLite format 3`), přepíše DB a
   restartuje appku. Záloha ověřena živě na emulátoru (validní soubor 90 kB v Downloads).

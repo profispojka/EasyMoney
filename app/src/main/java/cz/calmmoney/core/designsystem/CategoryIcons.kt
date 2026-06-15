@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.Handyman
 import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalAtm
 import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.LocalGasStation
 import androidx.compose.material.icons.filled.LocalParking
@@ -97,7 +98,7 @@ object CategoryIcons {
         "emoji_events", "celebration", "favorite", "medical_services",
         "health_and_safety",
         // Finance
-        "account_balance", "savings", "trending_up", "show_chart", "payments",
+        "account_balance", "local_atm", "savings", "trending_up", "show_chart", "payments",
         "sell", "credit_card", "receipt_long", "request_quote", "gavel", "policy",
         "shield", "verified_user", "support_agent", "business_center",
         // Lidé, dárky, ostatní
@@ -128,6 +129,7 @@ object CategoryIcons {
         "weekend" -> Icons.Filled.Weekend
         "home" -> Icons.Filled.Home
         "apartment" -> Icons.Filled.Apartment
+        "local_atm" -> Icons.Filled.LocalAtm
         "vpn_key" -> Icons.Filled.VpnKey
         "bolt" -> Icons.Filled.Bolt
         "build" -> Icons.Filled.Build

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,6 +33,7 @@ fun MoreScreen(
     onOpenAccounts: () -> Unit,
     onOpenCategories: () -> Unit,
     onOpenBudgets: () -> Unit,
+    onOpenFio: () -> Unit,
     onOpenBackup: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize()) {
@@ -40,6 +42,7 @@ fun MoreScreen(
         MoreRow(Icons.Filled.AccountBalanceWallet, "Účty", onOpenAccounts)
         MoreRow(Icons.AutoMirrored.Filled.Label, "Kategorie", onOpenCategories)
         MoreRow(Icons.Filled.PieChart, "Rozpočty", onOpenBudgets)
+        MoreRow(Icons.Filled.Sync, "Fio – import", onOpenFio)
         MoreRow(Icons.Filled.Backup, "Záloha dat", onOpenBackup)
     }
 }
