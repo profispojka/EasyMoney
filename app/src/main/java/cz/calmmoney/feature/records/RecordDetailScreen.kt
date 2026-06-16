@@ -35,6 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.component.CalmPrimaryButton
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.data.db.RecordEntity
+import cz.calmmoney.data.db.RecordSource
 import cz.calmmoney.data.db.RecordType
 import cz.calmmoney.data.repo.AccountRepository
 import cz.calmmoney.data.repo.CategoryRepository
@@ -160,12 +161,16 @@ fun RecordDetailScreen(
             if (!state.isTransfer) {
                 CalmPrimaryButton("Upravit", onClick = { onEdit(record.id) })
             }
-            OutlinedButton(
-                onClick = { confirmDelete = true },
-                shape = MaterialTheme.shapes.small,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-            ) {
-                Text("Smazat", style = MaterialTheme.typography.titleMedium)
+            // Záznamy z Fio jsou napojené na banku (smazaný se při synchronizaci vrátí) —
+            // mazat jdou jen ruční záznamy.
+            if (record.source != RecordSource.FIO) {
+                OutlinedButton(
+                    onClick = { confirmDelete = true },
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                ) {
+                    Text("Smazat", style = MaterialTheme.typography.titleMedium)
+                }
             }
         }
     }

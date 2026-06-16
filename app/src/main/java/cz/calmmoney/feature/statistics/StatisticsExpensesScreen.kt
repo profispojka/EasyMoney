@@ -1,9 +1,7 @@
 package cz.calmmoney.feature.statistics
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,10 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,11 +33,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.CategoryIcons
 import cz.calmmoney.core.designsystem.component.BarMeter
 import cz.calmmoney.core.designsystem.component.MoneyAmount
-import cz.calmmoney.core.designsystem.theme.Gray300
-import cz.calmmoney.core.designsystem.theme.Gray500
-import cz.calmmoney.core.designsystem.theme.Gray700
-import cz.calmmoney.core.designsystem.theme.Ink
-import cz.calmmoney.core.money.Money
 import cz.calmmoney.core.time.Periods
 import cz.calmmoney.data.db.RecordType
 import cz.calmmoney.data.repo.AccountRepository
@@ -141,28 +130,20 @@ fun StatisticsExpensesScreen(
             return@Column
         }
 
-        val selected = state.groups.firstOrNull { it.groupId == selectedId }
         val maxMinor = state.groups.firstOrNull()?.amountMinor ?: 0L
 
         LazyColumn(Modifier.fillMaxSize()) {
-            item(key = "month") {
-                Text(
-                    state.monthName,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
-            item(key = "donut") {
-                Box(Modifier.fillMaxWidth().padding(8.dp), contentAlignment = Alignment.Center) {
-                    ExpenseDonut(
-                        groups = state.groups,
-                        totalMinor = state.totalMinor,
-                        selectedId = selectedId,
-                        centerLabel = selected?.name ?: "Výdaje",
-                        centerAmountMinor = selected?.amountMinor ?: state.totalMinor,
+            item(key = "total") {
+                Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
+                    Text(
+                        state.monthName,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    Text("Výdaje", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    MoneyAmount(state.totalMinor, withSign = false, style = MaterialTheme.typography.headlineMedium)
                 }
+                HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
             }
             item(key = "hint") {
                 Text(
@@ -226,58 +207,5 @@ private fun GroupRow(
             MoneyAmount(-item.amountMinor, withSign = false, style = MaterialTheme.typography.bodyLarge)
         }
         BarMeter(fraction = if (maxMinor > 0) item.amountMinor.toFloat() / maxMinor else 0f, height = 8.dp)
-    }
-}
-
-/** Monochromatický prstencový graf. Slice = odstín šedi, vybraná kategorie = plná černá. */
-@Composable
-private fun ExpenseDonut(
-    groups: List<ExpenseGroupItem>,
-    totalMinor: Long,
-    selectedId: String?,
-    centerLabel: String,
-    centerAmountMinor: Long,
-) {
-    val palette = listOf(Ink, Gray700, Gray500, Gray300)
-    Box(Modifier.size(220.dp), contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize()) {
-            if (totalMinor <= 0) return@Canvas
-            val stroke = size.minDimension * 0.18f
-            val inset = stroke / 2f
-            val arcSize = Size(size.width - stroke, size.height - stroke)
-            val topLeft = Offset(inset, inset)
-            val gap = 2.5f
-            var startAngle = -90f
-            groups.forEachIndexed { i, g ->
-                val sweep = g.amountMinor.toFloat() / totalMinor * 360f
-                val color: Color = when {
-                    selectedId == null -> palette[i % palette.size]
-                    g.groupId == selectedId -> Ink
-                    else -> Gray300
-                }
-                drawArc(
-                    color = color,
-                    startAngle = startAngle + gap / 2f,
-                    sweepAngle = (sweep - gap).coerceAtLeast(0.5f),
-                    useCenter = false,
-                    topLeft = topLeft,
-                    size = arcSize,
-                    style = Stroke(width = stroke),
-                )
-                startAngle += sweep
-            }
-        }
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                centerLabel,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                Money.format(centerAmountMinor),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-        }
     }
 }

@@ -1,6 +1,0 @@
-Přístup do aplikací třetích stran
-V souladu se směrnicí EU č. 2015/2366, o platebních službách na vnitřním trhu, máte možnost povolit aplikacím třetích stran přístup k informacím o Vašem účtu, disponibilním zůstatku nebo možnost provést z něj platbu.
-
-Udělení přístupu můžete provést z aplikací třetích stran. Již udělený přístup můžete kdykoliv zrušit kliknutím na červený křížek.
-
-... - takze toklen nepottrebujeme ne?

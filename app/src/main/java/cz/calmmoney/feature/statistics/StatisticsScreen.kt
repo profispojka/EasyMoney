@@ -1,6 +1,5 @@
 package cz.calmmoney.feature.statistics
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,7 +36,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cz.calmmoney.core.designsystem.component.CalmCard
 import cz.calmmoney.core.designsystem.component.CalmTopBar
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.core.time.PlannedPayments
@@ -122,15 +119,12 @@ fun StatisticsScreen(
     Column(Modifier.fillMaxSize()) {
         CalmTopBar("Statistiky")
 
-        Column(
-            Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            StatCard("Zůstatek", state.netWorthMinor, withSign = false)
-            StatCard("Výdaje", -state.expenseMinor, onClick = { onOpenExpenses(state.ym.toString()) })
-            StatCard("Příjmy", state.incomeMinor)
-            StatCard("Cash flow", state.cashflowMinor)
-            StatCard("Výhled", -state.forecastMinor, subtitle = "výdaje příští měsíc")
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+            StatRow("Zůstatek", state.netWorthMinor, withSign = false)
+            StatRow("Výdaje", -state.expenseMinor, onClick = { onOpenExpenses(state.ym.toString()) })
+            StatRow("Příjmy", state.incomeMinor)
+            StatRow("Cash flow", state.cashflowMinor)
+            StatRow("Výhled", -state.forecastMinor, subtitle = "výdaje příští měsíc")
         }
 
         MonthSwitcher(
@@ -144,38 +138,37 @@ fun StatisticsScreen(
 }
 
 @Composable
-private fun StatCard(
+private fun StatRow(
     label: String,
     amountMinor: Long,
     withSign: Boolean = true,
     subtitle: String? = null,
     onClick: (() -> Unit)? = null,
 ) {
-    val cardModifier = Modifier.fillMaxWidth().then(
-        if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier,
-    )
-    CalmCard(cardModifier) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
+    val rowModifier = Modifier.fillMaxWidth()
+        .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+        .padding(horizontal = 16.dp, vertical = 14.dp)
+    Row(rowModifier, verticalAlignment = Alignment.CenterVertically) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                label.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            MoneyAmount(amountMinor, withSign = withSign, style = MaterialTheme.typography.headlineSmall)
+            if (subtitle != null) {
                 Text(
-                    label.uppercase(),
+                    subtitle,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                MoneyAmount(amountMinor, withSign = withSign, style = MaterialTheme.typography.headlineSmall)
-                if (subtitle != null) {
-                    Text(
-                        subtitle,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            if (onClick != null) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
             }
         }
+        if (onClick != null) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+        }
     }
+    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 }
 
 @Composable
@@ -197,21 +190,13 @@ private fun MonthSwitcher(
             Icon(Icons.Filled.ChevronLeft, contentDescription = "Předchozí měsíc")
         }
         Box(Modifier.weight(1f)) {
-            Surface(
-                onClick = { menuOpen = true },
-                shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.surface,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                modifier = Modifier.fillMaxWidth(),
+            Row(
+                Modifier.fillMaxWidth().clickable { menuOpen = true }.padding(vertical = 10.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    Modifier.padding(vertical = 10.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
-                }
+                Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
             }
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                 val options = (1 downTo -11).map { current.plusMonths(it.toLong()) }

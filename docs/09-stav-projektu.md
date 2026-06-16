@@ -37,8 +37,10 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   nepřidá duplicity). U karetních plateb vytáhne **obchodníka** z textu („Nákup: ALBERT…" → „ALBERT…").
   Tlačítko „Importovat ukázková data" zkusí import bez tokenu. Vyžádalo oprávnění **INTERNET**.
   **Ověřeno naživo** (424 transakcí za 90 dní, součty sedí). Pozn.: Fio bez silné autorizace dá
-  jen data ne starší **90 dní** (proto okno 90 dní; starší historie přes autorizaci v IB).
-  (PSD2 cesta jako Wallet nejde — chce vlastní AISP licenci od ČNB.)
+  jen data ne starší **90 dní**. (PSD2 cesta jako Wallet nejde — chce vlastní AISP licenci od ČNB.)
+  Obrazovka má dva stavy: **setup** (token + první sync) a **připojeno** (jen info + „Zrušit
+  synchronizaci"); po prvním syncu **běží synchronizace automaticky 1×/den na pozadí** (WorkManager),
+  ruční sync už uživatel nedělá.
 - **Detekce trvalých příkazů** (`core/recurring`) — Fio API je nevystavuje, tak je odvozujeme z
   historie (stejná částka + měsíční kadence). Více → Fio → „Najít opakované platby" → seznam návrhů
   s auto-kategorií → potvrzené se založí jako **měsíční plánované platby** (objeví se v „Nadcházející
@@ -69,7 +71,9 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
 - **Účty** — seznam s dopočteným zůstatkem (vč. převodů), přidání, mazání (z „Více → Účty“).
 - **Formulář transakce** — typy **Výdaj / Příjem / Převod**, číselná klávesnice (plnění zprava),
   výběr účtu, mřížka kategorií (s ikonami), poznámka, uložení do DB.
-- **Dashboard** — čisté jmění, přehled účtů, poslední záznamy (živě z DB).
+- **Dashboard** — čisté jmění, **graf „Vývoj výdajů"** (monochrom spojnice + šedá výplň,
+  `TrendChart`), přepínač období (30 dní / 12 týdnů / 6 měsíců / 1 rok) a **% změna** vs předchozí
+  stejně dlouhé období (`ExpenseTrend`), přehled účtů, nadcházející platby, poslední záznamy — živě z DB.
 - **Záznamy** — seskupení po dnech s denními součty + souhrn příjmů/výdajů.
 - **Kategorie** — seed dle Wallet (viz [kategorie-seed.md](kategorie-seed.md)): **11 skupin /
   69 podkategorií / 80 celkem**, z toho skupina **Příjem** = příjmová (INCOME), zbytek výdajové.

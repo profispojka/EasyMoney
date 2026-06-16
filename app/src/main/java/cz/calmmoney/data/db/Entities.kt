@@ -78,6 +78,8 @@ data class PlannedPaymentEntity(
     val startEpochDay: Long,        // kotva / první výskyt (jen datum)
     val endEpochDay: Long? = null,  // volitelný konec
     val note: String? = null,
+    // Do kterého výskytu (epoch day) je zaplaceno. Splatný = první výskyt po tomto datu.
+    val paidThroughEpochDay: Long? = null,
     val createdAt: Long,
     val updatedAt: Long,
 )

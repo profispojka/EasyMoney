@@ -45,7 +45,8 @@ object RecurringDetector {
 
             val dates = list.map { Instant.ofEpochMilli(it.dateTime).atZone(zone).toLocalDate() }.sorted()
             val months = dates.map { YearMonth.from(it) }.toSet()
-            if (months.size < 3) continue            // potřebujeme aspoň 3 měsíce
+            // ≥2 různé měsíce (z 90denního okna se měsíční příkaz často projeví jen 2×).
+            if (months.size < 2) continue
             if (list.size > months.size + 1) continue // častá útrata, ne pravidelná platba
 
             val gaps = dates.zipWithNext { a, b -> ChronoUnit.DAYS.between(a, b) }

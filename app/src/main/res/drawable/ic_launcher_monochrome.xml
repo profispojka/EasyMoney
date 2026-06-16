@@ -9,25 +9,25 @@
         android:pathData="M40,42 a14,14 0 1,1 28,0 a14,14 0 1,1 -28,0"
         android:fillColor="#00000000"
         android:strokeColor="#000000"
-        android:strokeWidth="5" />
+        android:strokeWidth="2.5" />
     <!-- Hladina -->
     <path
         android:pathData="M26,62 L82,62"
         android:fillColor="#00000000"
         android:strokeColor="#000000"
-        android:strokeWidth="5"
+        android:strokeWidth="2.5"
         android:strokeLineCap="round" />
     <!-- Odraz -->
     <path
         android:pathData="M41,70 L67,70"
         android:fillColor="#00000000"
         android:strokeColor="#000000"
-        android:strokeWidth="4"
+        android:strokeWidth="2"
         android:strokeLineCap="round" />
     <path
         android:pathData="M46,78 L62,78"
         android:fillColor="#00000000"
         android:strokeColor="#000000"
-        android:strokeWidth="4"
+        android:strokeWidth="2"
         android:strokeLineCap="round" />
 </vector>

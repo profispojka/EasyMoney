@@ -66,11 +66,11 @@ class RecurringViewModel @Inject constructor(
         viewModelScope.launch { _state.value = compute(null) }
     }
 
-    fun add(selected: List<RecurringDetector.Candidate>) {
+    /** Přidá vybrané jako plánované platby a **ukončí** wizard (zavře obrazovku). */
+    fun add(selected: List<RecurringDetector.Candidate>, onDone: () -> Unit) {
         viewModelScope.launch {
-            val accId = _state.value.accountId ?: return@launch
-            val n = recurring.addAsPlanned(accId, selected)
-            _state.value = compute("Přidáno $n plánovaných plateb.")
+            _state.value.accountId?.let { recurring.addAsPlanned(it, selected) }
+            onDone()
         }
     }
 
@@ -143,7 +143,7 @@ fun RecurringScreen(
                     }
                     CalmPrimaryButton(
                         text = "Přidat vybrané (${selected.size})",
-                        onClick = { vm.add(selected.map { it.candidate }) },
+                        onClick = { vm.add(selected.map { it.candidate }, onBack) },
                         enabled = selected.isNotEmpty(),
                     )
                 }

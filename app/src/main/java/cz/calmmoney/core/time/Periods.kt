@@ -14,9 +14,15 @@ object Periods {
     private val zone: ZoneId = ZoneId.systemDefault()
     private val monthFormatter: DateTimeFormatter =
         DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("cs-CZ"))
+    private val monthShortFormatter: DateTimeFormatter =
+        DateTimeFormatter.ofPattern("LLL", Locale.forLanguageTag("cs-CZ"))
 
     /** Název měsíce v nominativu, např. „srpen 2026". */
     fun monthName(ym: YearMonth): String = monthFormatter.format(ym)
+
+    /** Krátký název měsíce velkými písmeny pro osu grafu, např. „KVĚ". */
+    fun monthShort(ym: YearMonth): String =
+        monthShortFormatter.format(ym).uppercase(Locale.forLanguageTag("cs-CZ"))
 
     /** Popisek měsíce pro přepínač: „Tento měsíc" pro aktuální, jinak název měsíce. */
     fun monthLabel(ym: YearMonth, today: LocalDate = LocalDate.now()): String =

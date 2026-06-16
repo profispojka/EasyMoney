@@ -5,18 +5,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,7 +33,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,10 +44,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.component.CalmCard
 import cz.calmmoney.core.designsystem.component.CalmPrimaryButton
 import cz.calmmoney.core.designsystem.component.CalmTopBar
-import cz.calmmoney.core.fio.FioSample
+import cz.calmmoney.core.fio.FioSyncScheduler
+import cz.calmmoney.core.recurring.RecurringDetector
 import cz.calmmoney.data.db.AccountEntity
 import cz.calmmoney.data.repo.AccountRepository
-import cz.calmmoney.data.repo.CategorizationRepository
 import cz.calmmoney.data.repo.FioRepository
 import cz.calmmoney.data.repo.FioSyncResult
 import cz.calmmoney.data.repo.RecurringRepository
@@ -50,6 +57,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -65,14 +73,20 @@ data class FioPrefs(
     val accounts: List<AccountEntity> = emptyList(),
 )
 
-data class FioStatus(val busy: Boolean = false, val message: String? = null, val recurringFound: Int = 0)
+data class FioStatus(val busy: Boolean = false, val message: String? = null)
+
+/** Nabídka pravidelných plateb po synchronizaci (modal). */
+data class RecurringPrompt(
+    val accountId: String,
+    val candidates: List<RecurringDetector.Candidate>,
+)
 
 @HiltViewModel
 class FioViewModel @Inject constructor(
     private val settings: SettingsRepository,
     private val fio: FioRepository,
-    private val categorization: CategorizationRepository,
     private val recurring: RecurringRepository,
+    private val syncScheduler: FioSyncScheduler,
     accounts: AccountRepository,
 ) : ViewModel() {
 
@@ -85,32 +99,57 @@ class FioViewModel @Inject constructor(
     private val _status = MutableStateFlow(FioStatus())
     val status: StateFlow<FioStatus> = _status
 
-    fun saveAndSync(token: String, accountId: String) {
+    private val _recurringPrompt = MutableStateFlow<RecurringPrompt?>(null)
+    val recurringPrompt: StateFlow<RecurringPrompt?> = _recurringPrompt
+
+    init {
+        // Připojený účet → zajisti, že denní synchronizace běží (idempotentní).
+        viewModelScope.launch {
+            if (settings.fioLastSync.first() > 0L) syncScheduler.scheduleDaily()
+        }
+    }
+
+    fun saveAndSync(token: String, accountId: String) = launchSync(token, accountId, daysBack = 90)
+
+    /** Odpojí Fio (zastaví automatickou synchronizaci). Naimportované záznamy zůstanou. */
+    fun disconnect() {
+        viewModelScope.launch {
+            syncScheduler.cancel()
+            settings.clearFio()
+            _status.value = FioStatus()
+            _recurringPrompt.value = null
+        }
+    }
+
+    private fun launchSync(token: String, accountId: String, daysBack: Long) {
         viewModelScope.launch {
             settings.setFioConnection(token, accountId)
             _status.value = FioStatus(busy = true)
-            val r = fio.sync(token.trim(), accountId)
-            if (r is FioSyncResult.Success) settings.setFioLastSync(System.currentTimeMillis())
-            val found = if (r is FioSyncResult.Success) recurring.detectNew(accountId).size else 0
-            _status.value = FioStatus(busy = false, message = messageFor(r), recurringFound = found)
-        }
-    }
-
-    fun importDemo(accountId: String) {
-        viewModelScope.launch {
-            _status.value = FioStatus(busy = true)
-            val r = fio.importJson(FioSample.JSON, accountId)
+            val r = fio.sync(token.trim(), accountId, daysBack)
+            if (r is FioSyncResult.Success) {
+                settings.setFioLastSync(System.currentTimeMillis())
+                syncScheduler.scheduleDaily()
+            }
             _status.value = FioStatus(busy = false, message = messageFor(r))
+            if (r is FioSyncResult.Success) {
+                val cands = recurring.detectNew(accountId)
+                if (cands.isNotEmpty()) _recurringPrompt.value = RecurringPrompt(accountId, cands)
+            }
         }
     }
 
-    /** Znovu projede nezařazené záznamy podle aktuálních pravidel (po naučení/úpravě seedu). */
-    fun recategorize() {
+    /** „Ano" v modalu — přidá všechny nalezené pravidelné platby. */
+    fun addAllRecurring() {
+        val p = _recurringPrompt.value ?: return
         viewModelScope.launch {
-            _status.value = FioStatus(busy = true)
-            val n = categorization.recategorizeUncategorized()
-            _status.value = FioStatus(busy = false, message = "Dodatečně zařazeno $n záznamů.")
+            val n = recurring.addAsPlanned(p.accountId, p.candidates)
+            _recurringPrompt.value = null
+            _status.value = _status.value.copy(message = "Přidáno $n plánovaných plateb.")
         }
+    }
+
+    fun dismissRecurring() {
+        _recurringPrompt.value = null
     }
 
     private fun messageFor(r: FioSyncResult): String = when (r) {
@@ -128,12 +167,15 @@ fun FioScreen(
 ) {
     val prefs by vm.prefs.collectAsStateWithLifecycle()
     val status by vm.status.collectAsStateWithLifecycle()
+    val recurringPrompt by vm.recurringPrompt.collectAsStateWithLifecycle()
 
     var token by rememberSaveable(prefs.savedToken) { mutableStateOf(prefs.savedToken) }
     var accountId by remember(prefs.accountId, prefs.accounts) {
         mutableStateOf(prefs.accountId ?: prefs.accounts.firstOrNull()?.id)
     }
     val selectedAccount = prefs.accounts.firstOrNull { it.id == accountId }
+    var confirmDisconnect by remember { mutableStateOf(false) }
+    val connected = prefs.lastSyncMillis > 0
 
     Column(Modifier.fillMaxSize()) {
         CalmTopBar("Fio – import", onBack = onBack)
@@ -142,41 +184,55 @@ fun FioScreen(
             Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            CalmCard(Modifier.fillMaxWidth()) {
-                Text("Read-only napojení", style = MaterialTheme.typography.titleMedium)
-                Text(
-                    "Ve Fio internetbankingu: Nastavení → API → Přidat nový token → oprávnění " +
-                        "„Pouhé monitorování účtu“. Token vlož níže. Je jen pro čtení — platbu přes " +
-                        "něj poslat nelze.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 6.dp),
+            if (!connected) {
+                // --- Před prvním připojením: token + první synchronizace ---
+                CalmCard(Modifier.fillMaxWidth()) {
+                    Text("Read-only napojení", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "Ve Fio internetbankingu: Nastavení → API → Přidat nový token → oprávnění " +
+                            "„Pouhé monitorování účtu“. Token vlož níže. Je jen pro čtení — platbu přes " +
+                            "něj poslat nelze.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 6.dp),
+                    )
+                }
+
+                OutlinedTextField(
+                    value = token,
+                    onValueChange = { token = it },
+                    label = { Text("Fio token") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
                 )
-            }
 
-            OutlinedTextField(
-                value = token,
-                onValueChange = { token = it },
-                label = { Text("Fio token") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                Column {
+                    Text("Importovat do účtu", style = MaterialTheme.typography.labelLarge)
+                    AccountSelector(
+                        accounts = prefs.accounts,
+                        selected = selectedAccount,
+                        onSelect = { accountId = it.id },
+                    )
+                }
 
-            Column {
-                Text("Importovat do účtu", style = MaterialTheme.typography.labelLarge)
-                AccountSelector(
-                    accounts = prefs.accounts,
-                    selected = selectedAccount,
-                    onSelect = { accountId = it.id },
+                CalmPrimaryButton(
+                    text = if (status.busy) "Synchronizuji…" else "Uložit a synchronizovat",
+                    onClick = { accountId?.let { vm.saveAndSync(token, it) } },
+                    enabled = token.isNotBlank() && accountId != null && !status.busy,
                 )
+            } else {
+                // --- Připojeno: automatická denní synchronizace, ruční sync už netřeba ---
+                CalmCard(Modifier.fillMaxWidth()) {
+                    Text("Připojeno k Fio", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        "Účet: ${selectedAccount?.name ?: "—"}. Synchronizuje se automaticky každý " +
+                            "den na pozadí. Poslední: ${lastSyncLabel(prefs.lastSyncMillis)}.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 6.dp),
+                    )
+                }
             }
-
-            val canSync = token.isNotBlank() && accountId != null && !status.busy
-            CalmPrimaryButton(
-                text = if (status.busy) "Synchronizuji…" else "Uložit a synchronizovat",
-                onClick = { accountId?.let { vm.saveAndSync(token, it) } },
-                enabled = canSync,
-            )
 
             if (status.busy) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -188,61 +244,82 @@ fun FioScreen(
                 Text(it, style = MaterialTheme.typography.bodyMedium)
             }
 
-            if (status.recurringFound > 0) {
-                CalmCard(Modifier.fillMaxWidth()) {
-                    Text("Pravidelné platby", style = MaterialTheme.typography.titleMedium)
-                    Text(
-                        "Našel jsem ${status.recurringFound} plateb, co se opakují každý měsíc " +
-                            "(trvalé příkazy / předplatné). Chceš je přidat mezi plánované platby?",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 6.dp),
-                    )
-                    CalmPrimaryButton(text = "Zobrazit a přidat", onClick = onOpenRecurring)
+            if (connected) {
+                TextButton(
+                    onClick = onOpenRecurring,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Najít opakované platby (trvalé příkazy)")
+                }
+                OutlinedButton(
+                    onClick = { confirmDisconnect = true },
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                ) {
+                    Text("Zrušit synchronizaci", style = MaterialTheme.typography.titleMedium)
                 }
             }
+        }
+    }
 
-            Text(
-                "Poslední synchronizace: " + lastSyncLabel(prefs.lastSyncMillis),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-
-            Text(
-                "Pohyby se při importu rovnou kategorizují (podle pravidel a podle toho, jak je " +
-                    "sám zařazuješ). Co nejde určit, zůstane bez kategorie. Opakovaná synchronizace " +
-                    "nevytvoří duplicity (dedup dle ID pohybu).",
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            TextButton(
-                onClick = { vm.recategorize() },
-                enabled = !status.busy,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Překategorizovat nezařazené")
-            }
-            TextButton(
-                onClick = onOpenRecurring,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("Najít opakované platby (trvalé příkazy)")
-            }
-
-            CalmCard(Modifier.fillMaxWidth()) {
-                Text("Vyzkoušet bez tokenu", style = MaterialTheme.typography.titleMedium)
+    if (confirmDisconnect) {
+        AlertDialog(
+            onDismissRequest = { confirmDisconnect = false },
+            title = { Text("Zrušit synchronizaci?") },
+            text = {
                 Text(
-                    "Naimportuje 4 ukázkové pohyby do vybraného účtu, ať vidíš, jak to vypadá. " +
-                        "Klidně je pak smaž v Záznamech.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 6.dp),
+                    "Přestane se automaticky stahovat z Fia. Naimportované záznamy zůstanou. " +
+                        "Pro opětovné připojení zadáš token znovu.",
                 )
-                CalmPrimaryButton(
-                    text = "Importovat ukázková data",
-                    onClick = { accountId?.let { vm.importDemo(it) } },
-                    enabled = accountId != null && !status.busy,
-                )
+            },
+            confirmButton = {
+                TextButton(onClick = { confirmDisconnect = false; vm.disconnect() }) {
+                    Text("Zrušit synchronizaci")
+                }
+            },
+            dismissButton = { TextButton(onClick = { confirmDisconnect = false }) { Text("Zpět") } },
+        )
+    }
+
+    recurringPrompt?.let { prompt ->
+        Dialog(
+            onDismissRequest = { vm.dismissRecurring() },
+            properties = DialogProperties(usePlatformDefaultWidth = false),
+        ) {
+            Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Column(
+                    Modifier.fillMaxSize().padding(24.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column(
+                        Modifier.weight(1f).fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text("Pravidelné platby", style = MaterialTheme.typography.headlineSmall)
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            "Našel jsem ${prompt.candidates.size} plateb, co se opakují každý měsíc " +
+                                "(trvalé příkazy / předplatné). Přidat je mezi plánované platby?",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        TextButton(onClick = { vm.dismissRecurring(); onOpenRecurring() }) {
+                            Text("Raději vybrat ručně")
+                        }
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        CalmPrimaryButton(text = "Ano, přidat", onClick = { vm.addAllRecurring() })
+                        OutlinedButton(
+                            onClick = { vm.dismissRecurring() },
+                            shape = MaterialTheme.shapes.small,
+                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                        ) {
+                            Text("Ne", style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+                }
             }
         }
     }

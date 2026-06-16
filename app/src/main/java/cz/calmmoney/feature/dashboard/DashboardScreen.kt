@@ -1,6 +1,7 @@
 package cz.calmmoney.feature.dashboard
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +26,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.AccountTypeUi
 import cz.calmmoney.core.designsystem.component.CalmCard
+import cz.calmmoney.core.designsystem.component.CalmChip
 import cz.calmmoney.core.designsystem.component.CalmTopBar
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.core.designsystem.component.SectionHeader
+import cz.calmmoney.core.designsystem.component.TrendChart
 import cz.calmmoney.core.time.PlannedPayments
 import cz.calmmoney.data.db.RecordType
 import cz.calmmoney.data.repo.AccountRepository
@@ -40,6 +43,7 @@ import cz.calmmoney.feature.records.RecordRowItem
 import cz.calmmoney.feature.records.RecordRowUi
 import cz.calmmoney.feature.records.toRowUi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -48,11 +52,23 @@ import javax.inject.Inject
 
 data class UpcomingPayment(val name: String, val dateText: String, val signedAmountMinor: Long)
 
+/** Změna výdajů oproti minulému období: kladná = víc se utratilo. */
+private fun formatChangePct(pct: Int): String = when {
+    pct > 0 -> "+$pct %"
+    pct < 0 -> "− ${-pct} %"
+    else -> "0 %"
+}
+
 data class DashboardUiState(
     val netWorthMinor: Long = 0,
     val accounts: List<AccountRow> = emptyList(),
     val recent: List<RecordRowUi> = emptyList(),
     val upcoming: List<UpcomingPayment> = emptyList(),
+    val period: TrendPeriod = TrendPeriod.MONTHS_6,
+    val trendPoints: List<Long> = emptyList(),
+    val trendLabels: List<String> = emptyList(),
+    val trendTotalMinor: Long = 0,
+    val trendChangePct: Int? = null,
 )
 
 @HiltViewModel
@@ -62,6 +78,12 @@ class DashboardViewModel @Inject constructor(
     categories: CategoryRepository,
     planned: PlannedPaymentRepository,
 ) : ViewModel() {
+
+    private val periodFlow = MutableStateFlow(TrendPeriod.MONTHS_6)
+
+    fun setPeriod(period: TrendPeriod) {
+        periodFlow.value = period
+    }
 
     private val base = combine(
         accounts.observeNetWorthMinor(),
@@ -80,7 +102,11 @@ class DashboardViewModel @Inject constructor(
         )
     }
 
-    val state: StateFlow<DashboardUiState> = combine(base, planned.observeAll()) { dash, payments ->
+    private val trend = combine(records.observeAll(), periodFlow) { allRecs, period ->
+        period to ExpenseTrend.compute(period, allRecs)
+    }
+
+    val state: StateFlow<DashboardUiState> = combine(base, planned.observeAll(), trend) { dash, payments, td ->
         val today = LocalDate.now()
         val upcoming = payments
             .mapNotNull { p ->
@@ -96,7 +122,15 @@ class DashboardViewModel @Inject constructor(
                     signedAmountMinor = if (p.type == RecordType.EXPENSE) -p.amountMinor else p.amountMinor,
                 )
             }
-        dash.copy(upcoming = upcoming)
+        val (period, result) = td
+        dash.copy(
+            upcoming = upcoming,
+            period = period,
+            trendPoints = result.points,
+            trendLabels = result.axisLabels,
+            trendTotalMinor = result.totalMinor,
+            trendChangePct = result.changePct,
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardUiState())
 }
 
@@ -123,6 +157,52 @@ fun DashboardScreen(
                     withSign = false,
                     style = MaterialTheme.typography.displayLarge,
                 )
+            }
+
+            if (state.trendPoints.any { it > 0 }) {
+                Column {
+                    SectionHeader("Vývoj výdajů")
+                    CalmCard(Modifier.fillMaxWidth()) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Column(Modifier.weight(1f)) {
+                                Text(
+                                    state.period.label,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                MoneyAmount(
+                                    amountMinor = -state.trendTotalMinor,
+                                    withSign = false,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                )
+                            }
+                            state.trendChangePct?.let { pct ->
+                                Text(
+                                    formatChangePct(pct),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        TrendChart(
+                            points = state.trendPoints,
+                            labels = state.trendLabels,
+                            modifier = Modifier.padding(vertical = 12.dp),
+                        )
+                        Row(
+                            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            TrendPeriod.entries.forEach { p ->
+                                CalmChip(
+                                    label = p.label,
+                                    selected = state.period == p,
+                                    onClick = { vm.setPeriod(p) },
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             Column {

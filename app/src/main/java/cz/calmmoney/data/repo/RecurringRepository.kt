@@ -28,11 +28,20 @@ class RecurringRepository @Inject constructor(
             .filter { dedupKey(accountId, it.amountMinor, it.name) !in existing }
     }
 
-    /** Založí vybrané kandidáty jako měsíční plánované platby; vrátí počet. */
+    /**
+     * Založí vybrané kandidáty jako měsíční plánované platby; vrátí počet **skutečně přidaných**.
+     * Idempotentní — kandidáta, který už mezi plánovanými platbami je, přeskočí (žádné duplicity).
+     */
     suspend fun addAsPlanned(accountId: String, candidates: List<RecurringDetector.Candidate>): Int {
+        val existing = planned.observeAll().first()
+            .map { dedupKey(it.accountId, it.amountMinor, it.name) }.toMutableSet()
+        var added = 0
         candidates.forEach { c ->
+            val k = dedupKey(accountId, c.amountMinor, c.name)
+            if (k in existing) return@forEach
+            existing += k
             planned.create(
-                name = c.name.trim().ifBlank { "Platba" }.take(40),
+                name = c.name.trim().ifBlank { "Platba" },
                 type = RecordType.EXPENSE,
                 accountId = accountId,
                 categoryId = c.categoryId,
@@ -43,8 +52,9 @@ class RecurringRepository @Inject constructor(
                 endEpochDay = null,
                 note = "Z Fio (odhad z historie)",
             )
+            added++
         }
-        return candidates.size
+        return added
     }
 
     private fun dedupKey(accountId: String?, amountMinor: Long, name: String?): String =

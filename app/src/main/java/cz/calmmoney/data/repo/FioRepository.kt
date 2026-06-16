@@ -53,8 +53,8 @@ class FioRepository @Inject constructor(
             is FioFetchResult.HttpError -> when (r.code) {
                 404 -> FioSyncResult.Error("Neplatný token (HTTP 404). Zkontroluj, že je správně zkopírovaný.")
                 422 -> FioSyncResult.Error(
-                    "Fio bez autorizace poskytne jen data za posledních 90 dní. Starší historii " +
-                        "si nejdřív autorizuj ve Fio internetbankingu (platí 10 min).",
+                    "Pro data starší 90 dní odemkni token ve Fio internetbankingu: Nastavení → API → " +
+                        "ikona zámku u tokenu → potvrď (SMS/aplikace). Pak do 10 minut stáhni znovu.",
                 )
                 else -> FioSyncResult.Error("Fio odmítlo dotaz (HTTP ${r.code}).")
             }
