@@ -115,6 +115,10 @@ interface PlannedPaymentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(payment: PlannedPaymentEntity)
 
+    /** Posune „zaplaceno do" (epoch day) — výskyt(y) do tohoto data zmizí z nadcházejících. */
+    @Query("UPDATE planned_payments SET paidThroughEpochDay = :throughEpochDay, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun setPaidThrough(id: String, throughEpochDay: Long?, updatedAt: Long)
+
     @Delete
     suspend fun delete(payment: PlannedPaymentEntity)
 }

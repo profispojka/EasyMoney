@@ -33,7 +33,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.component.CalmCard
-import cz.calmmoney.core.designsystem.component.CalmPrimaryButton
 import cz.calmmoney.core.designsystem.component.CalmTopBar
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.core.designsystem.component.SectionHeader
@@ -111,7 +110,6 @@ class PlannedPaymentsViewModel @Inject constructor(
 
 @Composable
 fun PlannedPaymentsScreen(
-    onAdd: () -> Unit,
     onOpenDetail: (String) -> Unit,
     vm: PlannedPaymentsViewModel = hiltViewModel(),
 ) {
@@ -122,8 +120,6 @@ fun PlannedPaymentsScreen(
         CalmTopBar("Plánované platby")
 
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            CalmPrimaryButton("+ Nová platba", onClick = onAdd)
-
             CalmCard(Modifier.fillMaxWidth()) {
                 SectionHeader("Příští měsíc — ${state.nextMonthLabel}")
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
@@ -143,7 +139,7 @@ fun PlannedPaymentsScreen(
 
         if (state.rows.isEmpty()) {
             Text(
-                "Zatím žádné plánované platby. Přidej první přes „+ Nová platba“.",
+                "Zatím žádné plánované platby. Přidej první tlačítkem +.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp),

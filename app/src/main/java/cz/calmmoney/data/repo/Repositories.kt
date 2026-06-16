@@ -6,10 +6,14 @@ import cz.calmmoney.data.db.AccountType
 import cz.calmmoney.data.db.CategoryDao
 import cz.calmmoney.data.db.CategoryEntity
 import cz.calmmoney.data.db.CategoryType
+import cz.calmmoney.core.recurring.PlannedMatcher
+import cz.calmmoney.core.time.PlannedPayments
 import cz.calmmoney.data.db.RecordDao
 import cz.calmmoney.data.db.RecordEntity
 import cz.calmmoney.data.db.RecordType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -136,6 +140,7 @@ class BudgetRepository @Inject constructor(
 @Singleton
 class PlannedPaymentRepository @Inject constructor(
     private val dao: cz.calmmoney.data.db.PlannedPaymentDao,
+    private val recordDao: RecordDao,
 ) {
     fun observeAll(): Flow<List<cz.calmmoney.data.db.PlannedPaymentEntity>> = dao.observeAll()
     fun observeById(id: String): Flow<cz.calmmoney.data.db.PlannedPaymentEntity?> = dao.observeById(id)
@@ -185,6 +190,10 @@ class PlannedPaymentRepository @Inject constructor(
         note: String?,
     ) {
         val ts = now()
+        // Starší výskyty (před dneškem) ber jako vyřízené, ať nová platba nehází falešné „po splatnosti".
+        val paidThrough = PlannedPayments.lastOccurrenceBefore(
+            startEpochDay, frequencyUnit, frequencyCount, endEpochDay,
+        )
         dao.upsert(
             cz.calmmoney.data.db.PlannedPaymentEntity(
                 id = newId(),
@@ -198,10 +207,31 @@ class PlannedPaymentRepository @Inject constructor(
                 startEpochDay = startEpochDay,
                 endEpochDay = endEpochDay,
                 note = note?.trim()?.ifBlank { null },
+                paidThroughEpochDay = paidThrough,
                 createdAt = ts,
                 updatedAt = ts,
             )
         )
+    }
+
+    /** Označí splatný výskyt jako zaplacený (ručně napojený na transakci) — zmizí z nadcházejících. */
+    suspend fun markPaid(id: String, throughEpochDay: Long) = dao.setPaidThrough(id, throughEpochDay, now())
+
+    /**
+     * Projde všechny plánované platby a podle existujících transakcí posune „zaplaceno do"
+     * (auto-párování). Volá se po Fio synchronizaci.
+     */
+    suspend fun reconcileAll() {
+        val payments = dao.observeAll().first()
+        if (payments.isEmpty()) return
+        val records = recordDao.observeAll().first()
+        val today = LocalDate.now()
+        payments.forEach { p ->
+            val newPaid = PlannedMatcher.reconcile(p, records, today)
+            if (newPaid != null && newPaid != p.paidThroughEpochDay) {
+                dao.setPaidThrough(p.id, newPaid, now())
+            }
+        }
     }
 
     suspend fun delete(payment: cz.calmmoney.data.db.PlannedPaymentEntity) = dao.delete(payment)

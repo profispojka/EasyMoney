@@ -39,6 +39,10 @@ object Routes {
     const val PLANNED_DETAIL_ROUTE = "planned_detail/{plannedId}"
     fun plannedDetail(id: String) = "planned_detail/$id"
 
+    // Ruční napojení nadcházející platby na konkrétní transakci.
+    const val MATCH_PAYMENT_ROUTE = "match_payment/{plannedId}"
+    fun matchPayment(id: String) = "match_payment/$id"
+
     const val CATEGORIES = "categories"
     const val BACKUP = "backup"
     const val FIO = "fio"

@@ -40,6 +40,7 @@ import cz.calmmoney.feature.fio.FioScreen
 import cz.calmmoney.feature.more.MoreScreen
 import cz.calmmoney.feature.onboarding.OnboardingScreen
 import cz.calmmoney.feature.planned.AddPlannedPaymentScreen
+import cz.calmmoney.feature.planned.MatchPaymentScreen
 import cz.calmmoney.feature.planned.PlannedPaymentDetailScreen
 import cz.calmmoney.feature.planned.PlannedPaymentsScreen
 import cz.calmmoney.feature.records.RecordsScreen
@@ -69,9 +70,15 @@ private fun MainScaffold() {
         containerColor = MaterialTheme.colorScheme.background,
         bottomBar = { if (isTopLevel) CalmBottomBar(navController) },
         floatingActionButton = {
-            if (isTopLevel && currentRoute != Routes.STATISTICS) {
+            // FAB jen na Přehledu (nový záznam) a Platbách (nová plánovaná platba).
+            val fabRoute = when (currentRoute) {
+                Routes.DASHBOARD -> Routes.ADD_RECORD
+                Routes.PLANNED -> Routes.ADD_PLANNED
+                else -> null
+            }
+            if (fabRoute != null) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Routes.ADD_RECORD) },
+                    onClick = { navController.navigate(fabRoute) },
                     shape = CircleShape,
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -94,6 +101,7 @@ private fun MainScaffold() {
                 DashboardScreen(
                     onOpenRecord = { navController.navigate(Routes.recordDetail(it)) },
                     onOpenPlanned = { navController.navigate(Routes.PLANNED) },
+                    onMatchPayment = { navController.navigate(Routes.matchPayment(it)) },
                 )
             }
             composable(Routes.RECORDS) {
@@ -165,7 +173,6 @@ private fun MainScaffold() {
             }
             composable(Routes.PLANNED) {
                 PlannedPaymentsScreen(
-                    onAdd = { navController.navigate(Routes.ADD_PLANNED) },
                     onOpenDetail = { id -> navController.navigate(Routes.plannedDetail(id)) },
                 )
             }
@@ -177,6 +184,12 @@ private fun MainScaffold() {
                     onBack = { navController.popBackStack() },
                     onEdit = { id -> navController.navigate(Routes.editPlanned(id)) },
                 )
+            }
+            composable(
+                route = Routes.MATCH_PAYMENT_ROUTE,
+                arguments = listOf(navArgument("plannedId") { type = NavType.StringType }),
+            ) {
+                MatchPaymentScreen(onBack = { navController.popBackStack() })
             }
             composable(
                 route = Routes.ADD_PLANNED_ROUTE,

@@ -25,7 +25,13 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   (např. 2×/ročně se započítá jen v měsíci, kdy nastane).
 - **Plánované platby — dotaženo:** **detail** platby + **„Zaplatit teď"** (vytvoří reálný
   záznam), **editace** (předvyplněný formulář), **smazání**; na dashboardu karta
-  **„Nadcházející platby"** (3 nejbližší výskyty dle data).
+  **„Nadcházející platby"** (5 nejbližších výskytů dle data).
+- **Párování plateb s transakcemi** (DB v6, nedestruktivní migrace): plánovaná platba si pamatuje,
+  do kterého výskytu je zaplaceno (`paidThroughEpochDay`). Splatný výskyt po termínu má na přehledu
+  badge **„Po splatnosti"**. **Auto:** po Fio synchronizaci (i při otevření přehledu) se platba sama
+  napojí na transakci se stejným obchodníkem, ~částkou a datem kolem výskytu → zmizí z nadcházejících.
+  **Ručně:** klik na platbu → výběr konkrétní transakce, která ji zaplatila (`MatchPaymentScreen`) →
+  označí se jako zaplacená. Ověřeno na emulátoru (migrace zachovala 431 záznamů/6 plateb).
 - **Vlastní kategorie** (Více → Kategorie) — seznam s hierarchií (skupina + podkategorie),
   přepínač Výdaje/Příjmy, **přidat / upravit / smazat** (mazání skupiny i s podkategoriemi).
   Formulář: název, typ, nadřazená kategorie, **výběr ikony** (mřížka ~69 monochrom ikon).
@@ -80,7 +86,8 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   Vkládá se při vytvoření DB; ikony monochrom — **rozšířený set (~69 ikon)**, takže skupina
   i (téměř) každá podkategorie mají vlastní výstižný glyph (košík, burger, šálek, kufřík,
   pumpa, kostka, …).
-  DB **verze 5** — změna seedu (vč. ikon) se nasadí destruktivní migrací (reseed).
+  DB **verze 6** — změna seedu (vč. ikon) se nasadí destruktivní migrací (reseed); od v5→v6
+  ale **nedestruktivní migrace** (`paidThroughEpochDay` u plánovaných plateb), aby reálná data zůstala.
 
 ## Co je hotové (Fáze 0)
 - **Gradle projekt** (Kotlin DSL, version catalog `gradle/libs.versions.toml`, wrapper 8.11.1).

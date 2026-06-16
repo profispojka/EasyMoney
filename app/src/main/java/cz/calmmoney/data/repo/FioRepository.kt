@@ -36,6 +36,7 @@ class FioRepository @Inject constructor(
     private val client: FioApiClient,
     private val recordDao: RecordDao,
     private val categorization: CategorizationRepository,
+    private val planned: PlannedPaymentRepository,
 ) {
     private val zone: ZoneId = ZoneId.systemDefault()
 
@@ -48,7 +49,10 @@ class FioRepository @Inject constructor(
         val to = LocalDate.now()
         val from = to.minusDays(daysBack)
         return when (val r = client.fetchPeriods(token, from, to)) {
-            is FioFetchResult.Success -> importJson(r.json, accountId)
+            is FioFetchResult.Success -> importJson(r.json, accountId).also {
+                // Po importu zkus napárovat plánované platby na nové transakce (auto „zaplaceno").
+                if (it is FioSyncResult.Success) planned.reconcileAll()
+            }
             FioFetchResult.RateLimited -> FioSyncResult.RateLimited
             is FioFetchResult.HttpError -> when (r.code) {
                 404 -> FioSyncResult.Error("Neplatný token (HTTP 404). Zkontroluj, že je správně zkopírovaný.")

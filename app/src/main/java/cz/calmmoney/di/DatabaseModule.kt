@@ -3,6 +3,7 @@ package cz.calmmoney.di
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import cz.calmmoney.data.db.AccountDao
 import cz.calmmoney.data.db.CalmMoneyDatabase
@@ -20,10 +21,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
+    // v5 → v6: plánovaná platba si pamatuje, do kdy je zaplaceno (párování s transakcemi).
+    // Nedestruktivní — jen přidá sloupec, existující data (záznamy, platby) zůstanou.
+    private val MIGRATION_5_6 = object : Migration(5, 6) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE planned_payments ADD COLUMN paidThroughEpochDay INTEGER")
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): CalmMoneyDatabase =
         Room.databaseBuilder(context, CalmMoneyDatabase::class.java, CalmMoneyDatabase.NAME)
+            .addMigrations(MIGRATION_5_6)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)

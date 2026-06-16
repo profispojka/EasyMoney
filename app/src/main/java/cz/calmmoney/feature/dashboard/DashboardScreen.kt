@@ -1,5 +1,6 @@
 package cz.calmmoney.feature.dashboard
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,9 +50,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UpcomingPayment(val name: String, val dateText: String, val signedAmountMinor: Long)
+data class UpcomingPayment(
+    val plannedId: String,
+    val name: String,
+    val dateText: String,
+    val signedAmountMinor: Long,
+    val overdue: Boolean,
+)
 
 /** Změna výdajů oproti minulému období: kladná = víc se utratilo. */
 private fun formatChangePct(pct: Int): String = when {
@@ -81,6 +90,11 @@ class DashboardViewModel @Inject constructor(
 
     private val periodFlow = MutableStateFlow(TrendPeriod.MONTHS_6)
 
+    init {
+        // Napáruj plánované platby na existující transakce i bez nového Fio syncu.
+        viewModelScope.launch { planned.reconcileAll() }
+    }
+
     fun setPeriod(period: TrendPeriod) {
         periodFlow.value = period
     }
@@ -110,16 +124,18 @@ class DashboardViewModel @Inject constructor(
         val today = LocalDate.now()
         val upcoming = payments
             .mapNotNull { p ->
-                PlannedPayments.nextOccurrence(p.startEpochDay, p.frequencyUnit, p.frequencyCount, p.endEpochDay, today)
+                PlannedPayments.dueOccurrence(p.startEpochDay, p.frequencyUnit, p.frequencyCount, p.endEpochDay, p.paidThroughEpochDay)
                     ?.let { date -> p to date }
             }
             .sortedBy { it.second }
-            .take(3)
+            .take(5)
             .map { (p, date) ->
                 UpcomingPayment(
+                    plannedId = p.id,
                     name = p.name,
                     dateText = PlannedPayments.formatDate(date),
                     signedAmountMinor = if (p.type == RecordType.EXPENSE) -p.amountMinor else p.amountMinor,
+                    overdue = date.isBefore(today),
                 )
             }
         val (period, result) = td
@@ -138,6 +154,7 @@ class DashboardViewModel @Inject constructor(
 fun DashboardScreen(
     onOpenRecord: (String) -> Unit,
     onOpenPlanned: () -> Unit,
+    onMatchPayment: (String) -> Unit,
     vm: DashboardViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
@@ -234,14 +251,18 @@ fun DashboardScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable(onClick = onOpenPlanned)
+                                    .clickable { onMatchPayment(p.plannedId) }
                                     .padding(vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                             ) {
                                 Column(Modifier.weight(1f)) {
                                     Text(p.name, style = MaterialTheme.typography.bodyLarge)
-                                    Text(p.dateText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    if (p.overdue) {
+                                        OverdueBadge(p.dateText)
+                                    } else {
+                                        Text(p.dateText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
                                 }
                                 MoneyAmount(p.signedAmountMinor, withSign = true, style = MaterialTheme.typography.bodyLarge)
                             }
@@ -268,5 +289,25 @@ fun DashboardScreen(
                 }
             }
         }
+    }
+}
+
+/** Monochromatický štítek „Po splatnosti" + datum splatnosti (E-Ink, bez barvy). */
+@Composable
+private fun OverdueBadge(dateText: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.padding(top = 2.dp),
+    ) {
+        Text(
+            "Po splatnosti",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(4.dp))
+                .padding(horizontal = 6.dp, vertical = 1.dp),
+        )
+        Text(dateText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

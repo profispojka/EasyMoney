@@ -54,6 +54,50 @@ object PlannedPayments {
         return d
     }
 
+    /**
+     * Splatný (= první **nezaplacený**) výskyt: první výskyt po dni [paidThroughEpochDay].
+     * Pokud nic není zaplaceno, je to první výskyt platby. Může padnout i do minulosti
+     * (pak je „po splatnosti"). null = už nikdy (po konci).
+     */
+    fun dueOccurrence(
+        startEpochDay: Long,
+        unit: FrequencyUnit,
+        count: Int,
+        endEpochDay: Long?,
+        paidThroughEpochDay: Long?,
+    ): LocalDate? {
+        val from = paidThroughEpochDay?.let { LocalDate.ofEpochDay(it + 1) } ?: LocalDate.ofEpochDay(startEpochDay)
+        return nextOccurrence(startEpochDay, unit, count, endEpochDay, from)
+    }
+
+    /**
+     * Poslední výskyt **striktně před** dnem [today] — pro inicializaci „zaplaceno do" u nově
+     * založené platby (aby se staré výskyty nebraly jako po splatnosti). null = první výskyt je
+     * dnes nebo později (nic zaplaceno).
+     */
+    fun lastOccurrenceBefore(
+        startEpochDay: Long,
+        unit: FrequencyUnit,
+        count: Int,
+        endEpochDay: Long?,
+        today: LocalDate = LocalDate.now(),
+    ): Long? {
+        val start = LocalDate.ofEpochDay(startEpochDay)
+        if (!start.isBefore(today)) return null
+        val end = endEpochDay?.let { LocalDate.ofEpochDay(it) }
+        var d = start
+        var last = start
+        var guard = 0
+        while (guard++ < 100_000) {
+            val n = step(d, unit, count)
+            if (!n.isBefore(today)) break
+            if (end != null && n.isAfter(end)) break
+            last = n
+            d = n
+        }
+        return last.toEpochDay()
+    }
+
     /** Počet výskytů platby v kalendářním měsíci [ym]. */
     fun occurrencesInMonth(
         startEpochDay: Long,
