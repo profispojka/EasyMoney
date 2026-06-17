@@ -64,7 +64,11 @@ class AddAccountViewModel @Inject constructor(
 }
 
 @Composable
-fun AddAccountScreen(onClose: () -> Unit, vm: AddAccountViewModel = hiltViewModel()) {
+fun AddAccountScreen(
+    onClose: () -> Unit,
+    onOpenRecurring: () -> Unit,
+    vm: AddAccountViewModel = hiltViewModel(),
+) {
     val account by vm.account.collectAsStateWithLifecycle()
 
     Column(Modifier.fillMaxSize()) {
@@ -96,6 +100,11 @@ fun AddAccountScreen(onClose: () -> Unit, vm: AddAccountViewModel = hiltViewMode
                     initialType = a?.type ?: AccountType.CASH,
                     initialBalanceText = a?.let { Money.toPlainAmount(it.initialBalanceMinor) } ?: "",
                 )
+
+                // Fio napojení patří ke konkrétnímu účtu — jen u už existujícího.
+                if (vm.isEditing) {
+                    AccountFioSection(onOpenRecurring = onOpenRecurring)
+                }
             }
         }
     }

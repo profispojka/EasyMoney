@@ -21,17 +21,18 @@ class FioSyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val token = settings.fioToken.first()
-        val accountId = settings.fioAccountId.first()
-        if (token.isBlank() || accountId == null) return Result.success()
-        return when (fio.sync(token, accountId, 90)) {
-            is FioSyncResult.Success -> {
-                settings.setFioLastSync(System.currentTimeMillis())
-                Result.success()
+        val connections = settings.fioConnections.first()
+        if (connections.isEmpty()) return Result.success()
+        var anyRetry = false
+        for (c in connections) {
+            if (c.token.isBlank()) continue
+            when (fio.sync(c.token, c.accountId, 90)) {
+                is FioSyncResult.Success -> settings.setFioLastSync(c.accountId, System.currentTimeMillis())
+                FioSyncResult.RateLimited -> anyRetry = true
+                is FioSyncResult.Error -> anyRetry = true
             }
-            FioSyncResult.RateLimited -> Result.retry()
-            is FioSyncResult.Error -> Result.retry()
         }
+        return if (anyRetry) Result.retry() else Result.success()
     }
 
     companion object {

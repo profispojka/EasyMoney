@@ -9,10 +9,19 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.json.JSONArray
+import org.json.JSONObject
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
+
+/** Jedno read-only napojení na Fio účet: token + cílový CalmMoney účet + čas posledního syncu. */
+data class FioConnection(
+    val token: String,
+    val accountId: String,
+    val lastSyncMillis: Long = 0L,
+)
 
 /** Uživatelská nastavení v DataStore (nikoli v Room). */
 @Singleton
@@ -21,6 +30,9 @@ class SettingsRepository @Inject constructor(
 ) {
     private object Keys {
         val ONBOARDING_DONE = booleanPreferencesKey("onboarding_done")
+        // Více Fio připojení jako JSON pole [{token, accountId, lastSync}].
+        val FIO_CONNECTIONS = stringPreferencesKey("fio_connections")
+        // Staré klíče (jedno připojení) — jen pro migraci na seznam.
         val FIO_TOKEN = stringPreferencesKey("fio_token")
         val FIO_ACCOUNT_ID = stringPreferencesKey("fio_account_id")
         val FIO_LAST_SYNC = longPreferencesKey("fio_last_sync")
@@ -33,34 +45,109 @@ class SettingsRepository @Inject constructor(
         context.settingsDataStore.edit { it[Keys.ONBOARDING_DONE] = value }
     }
 
-    /** Fio read-only token (jen pro export dat). Prázdné = nenastaveno. */
-    val fioToken: Flow<String> =
-        context.settingsDataStore.data.map { it[Keys.FIO_TOKEN] ?: "" }
+    // --- Fio připojení (více účtů) ---
 
-    /** ID účtu CalmMoney, do kterého se Fio pohyby importují. */
-    val fioAccountId: Flow<String?> =
-        context.settingsDataStore.data.map { it[Keys.FIO_ACCOUNT_ID] }
-
-    /** Čas poslední úspěšné synchronizace (epoch millis), 0 = nikdy. */
-    val fioLastSync: Flow<Long> =
-        context.settingsDataStore.data.map { it[Keys.FIO_LAST_SYNC] ?: 0L }
-
-    suspend fun setFioConnection(token: String, accountId: String) {
-        context.settingsDataStore.edit {
-            it[Keys.FIO_TOKEN] = token.trim()
-            it[Keys.FIO_ACCOUNT_ID] = accountId
+    /** Všechna připojená Fio konta. Než proběhne migrace, čte i staré jedno-připojení. */
+    val fioConnections: Flow<List<FioConnection>> = context.settingsDataStore.data.map { prefs ->
+        prefs[Keys.FIO_CONNECTIONS]?.let { parse(it) } ?: run {
+            val token = prefs[Keys.FIO_TOKEN]
+            val accId = prefs[Keys.FIO_ACCOUNT_ID]
+            if (!token.isNullOrBlank() && accId != null) {
+                listOf(FioConnection(token, accId, prefs[Keys.FIO_LAST_SYNC] ?: 0L))
+            } else {
+                emptyList()
+            }
         }
     }
 
-    suspend fun setFioLastSync(epochMillis: Long) {
-        context.settingsDataStore.edit { it[Keys.FIO_LAST_SYNC] = epochMillis }
-    }
-
-    suspend fun clearFio() {
-        context.settingsDataStore.edit {
-            it.remove(Keys.FIO_TOKEN)
-            it.remove(Keys.FIO_ACCOUNT_ID)
-            it.remove(Keys.FIO_LAST_SYNC)
+    /** Jednorázová migrace starého jednoho připojení do seznamu (a úklid starých klíčů). */
+    suspend fun migrateLegacyFio() {
+        context.settingsDataStore.edit { prefs ->
+            if (prefs[Keys.FIO_CONNECTIONS] == null) {
+                val token = prefs[Keys.FIO_TOKEN]
+                val accId = prefs[Keys.FIO_ACCOUNT_ID]
+                if (!token.isNullOrBlank() && accId != null) {
+                    prefs[Keys.FIO_CONNECTIONS] = serialize(
+                        listOf(FioConnection(token, accId, prefs[Keys.FIO_LAST_SYNC] ?: 0L)),
+                    )
+                }
+            }
+            prefs.remove(Keys.FIO_TOKEN)
+            prefs.remove(Keys.FIO_ACCOUNT_ID)
+            prefs.remove(Keys.FIO_LAST_SYNC)
         }
     }
+
+    /** Přidá nebo aktualizuje připojení (klíč = accountId); zachová předchozí lastSync. */
+    suspend fun upsertFioConnection(token: String, accountId: String) {
+        context.settingsDataStore.edit { prefs ->
+            val list = currentList(prefs).toMutableList()
+            val prev = list.firstOrNull { it.accountId == accountId }
+            list.removeAll { it.accountId == accountId }
+            list += FioConnection(token.trim(), accountId, prev?.lastSyncMillis ?: 0L)
+            prefs[Keys.FIO_CONNECTIONS] = serialize(list)
+            cleanLegacy(prefs)
+        }
+    }
+
+    /** Zapíše čas posledního úspěšného syncu pro dané konto. */
+    suspend fun setFioLastSync(accountId: String, epochMillis: Long) {
+        context.settingsDataStore.edit { prefs ->
+            val list = currentList(prefs).map {
+                if (it.accountId == accountId) it.copy(lastSyncMillis = epochMillis) else it
+            }
+            prefs[Keys.FIO_CONNECTIONS] = serialize(list)
+            cleanLegacy(prefs)
+        }
+    }
+
+    /** Odpojí jedno Fio konto (naimportované záznamy zůstanou). */
+    suspend fun removeFioConnection(accountId: String) {
+        context.settingsDataStore.edit { prefs ->
+            val list = currentList(prefs).filterNot { it.accountId == accountId }
+            prefs[Keys.FIO_CONNECTIONS] = serialize(list)
+            cleanLegacy(prefs)
+        }
+    }
+
+    private fun currentList(prefs: androidx.datastore.preferences.core.Preferences): List<FioConnection> {
+        prefs[Keys.FIO_CONNECTIONS]?.let { return parse(it) }
+        val token = prefs[Keys.FIO_TOKEN]
+        val accId = prefs[Keys.FIO_ACCOUNT_ID]
+        return if (!token.isNullOrBlank() && accId != null) {
+            listOf(FioConnection(token, accId, prefs[Keys.FIO_LAST_SYNC] ?: 0L))
+        } else {
+            emptyList()
+        }
+    }
+
+    private fun cleanLegacy(prefs: androidx.datastore.preferences.core.MutablePreferences) {
+        prefs.remove(Keys.FIO_TOKEN)
+        prefs.remove(Keys.FIO_ACCOUNT_ID)
+        prefs.remove(Keys.FIO_LAST_SYNC)
+    }
+
+    private fun serialize(list: List<FioConnection>): String {
+        val arr = JSONArray()
+        list.forEach { c ->
+            arr.put(
+                JSONObject()
+                    .put("token", c.token)
+                    .put("accountId", c.accountId)
+                    .put("lastSync", c.lastSyncMillis),
+            )
+        }
+        return arr.toString()
+    }
+
+    private fun parse(json: String): List<FioConnection> = runCatching {
+        val arr = JSONArray(json)
+        (0 until arr.length()).mapNotNull { i ->
+            val o = arr.optJSONObject(i) ?: return@mapNotNull null
+            val token = o.optString("token")
+            val accId = o.optString("accountId")
+            if (token.isBlank() || accId.isBlank()) null
+            else FioConnection(token, accId, o.optLong("lastSync", 0L))
+        }
+    }.getOrDefault(emptyList())
 }

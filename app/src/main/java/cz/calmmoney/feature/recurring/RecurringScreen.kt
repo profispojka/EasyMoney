@@ -43,12 +43,12 @@ import javax.inject.Inject
 data class RecurringRowUi(
     val candidate: RecurringDetector.Candidate,
     val categoryName: String,
+    val accountId: String,
 )
 
 data class RecurringUiState(
     val rows: List<RecurringRowUi> = emptyList(),
     val loading: Boolean = true,
-    val accountId: String? = null,
     val message: String? = null,
 )
 
@@ -66,20 +66,24 @@ class RecurringViewModel @Inject constructor(
         viewModelScope.launch { _state.value = compute(null) }
     }
 
-    /** Přidá vybrané jako plánované platby a **ukončí** wizard (zavře obrazovku). */
-    fun add(selected: List<RecurringDetector.Candidate>, onDone: () -> Unit) {
+    /** Přidá vybrané jako plánované platby (po účtech) a **ukončí** wizard (zavře obrazovku). */
+    fun add(selected: List<RecurringRowUi>, onDone: () -> Unit) {
         viewModelScope.launch {
-            _state.value.accountId?.let { recurring.addAsPlanned(it, selected) }
+            selected.groupBy { it.accountId }.forEach { (accId, rows) ->
+                recurring.addAsPlanned(accId, rows.map { it.candidate })
+            }
             onDone()
         }
     }
 
     private suspend fun compute(message: String?): RecurringUiState {
-        val accId = settings.fioAccountId.first()
+        val accIds = settings.fioConnections.first().map { it.accountId }
         val catMap = categories.observeAll().first().associateBy { it.id }
-        val rows = recurring.detectNew(accId)
-            .map { RecurringRowUi(it, catMap[it.categoryId]?.name ?: "Bez kategorie") }
-        return RecurringUiState(rows = rows, loading = false, accountId = accId, message = message)
+        val rows = accIds.flatMap { accId ->
+            recurring.detectNew(accId)
+                .map { RecurringRowUi(it, catMap[it.categoryId]?.name ?: "Bez kategorie", accId) }
+        }
+        return RecurringUiState(rows = rows, loading = false, message = message)
     }
 }
 
@@ -115,8 +119,8 @@ fun RecurringScreen(
                     modifier = Modifier.padding(16.dp),
                 )
                 LazyColumn(Modifier.weight(1f)) {
-                    items(state.rows, key = { it.candidate.key + it.candidate.amountMinor }) { row ->
-                        val k = row.candidate.key + row.candidate.amountMinor
+                    items(state.rows, key = { it.accountId + it.candidate.key + it.candidate.amountMinor }) { row ->
+                        val k = row.accountId + row.candidate.key + row.candidate.amountMinor
                         val isChecked = checked[k] ?: true
                         Row(
                             Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
@@ -136,14 +140,14 @@ fun RecurringScreen(
                         HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
                     }
                 }
-                val selected = state.rows.filter { (checked[it.candidate.key + it.candidate.amountMinor] ?: true) }
+                val selected = state.rows.filter { (checked[it.accountId + it.candidate.key + it.candidate.amountMinor] ?: true) }
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     state.message?.let {
                         Text(it, style = MaterialTheme.typography.bodyMedium)
                     }
                     CalmPrimaryButton(
                         text = "Přidat vybrané (${selected.size})",
-                        onClick = { vm.add(selected.map { it.candidate }, onBack) },
+                        onClick = { vm.add(selected, onBack) },
                         enabled = selected.isNotEmpty(),
                     )
                 }

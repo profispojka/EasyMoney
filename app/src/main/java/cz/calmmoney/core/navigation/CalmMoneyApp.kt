@@ -36,7 +36,6 @@ import cz.calmmoney.feature.categories.AddCategoryScreen
 import cz.calmmoney.feature.categories.CategoriesScreen
 import cz.calmmoney.feature.categories.CategoryPickerScreen
 import cz.calmmoney.feature.dashboard.DashboardScreen
-import cz.calmmoney.feature.fio.FioScreen
 import cz.calmmoney.feature.more.MoreScreen
 import cz.calmmoney.feature.onboarding.OnboardingScreen
 import cz.calmmoney.feature.planned.AddPlannedPaymentScreen
@@ -106,7 +105,6 @@ private fun MainScaffold() {
             }
             composable(Routes.RECORDS) {
                 RecordsScreen(
-                    onBack = { navController.popBackStack() },
                     onOpenRecord = { navController.navigate(Routes.recordDetail(it)) },
                 )
             }
@@ -135,18 +133,10 @@ private fun MainScaffold() {
             }
             composable(Routes.MORE) {
                 MoreScreen(
-                    onOpenRecords = { navController.navigate(Routes.RECORDS) },
                     onOpenAccounts = { navController.navigate(Routes.ACCOUNTS) },
                     onOpenCategories = { navController.navigate(Routes.CATEGORIES) },
                     onOpenBudgets = { navController.navigate(Routes.BUDGETS) },
-                    onOpenFio = { navController.navigate(Routes.FIO) },
                     onOpenBackup = { navController.navigate(Routes.BACKUP) },
-                )
-            }
-            composable(Routes.FIO) {
-                FioScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpenRecurring = { navController.navigate(Routes.RECURRING) },
                 )
             }
             composable(Routes.RECURRING) {
@@ -263,7 +253,10 @@ private fun MainScaffold() {
                     defaultValue = null
                 }),
             ) {
-                AddAccountScreen(onClose = { navController.popBackStack() })
+                AddAccountScreen(
+                    onClose = { navController.popBackStack() },
+                    onOpenRecurring = { navController.navigate(Routes.RECURRING) },
+                )
             }
         }
     }

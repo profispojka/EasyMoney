@@ -36,17 +36,21 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   přepínač Výdaje/Příjmy, **přidat / upravit / smazat** (mazání skupiny i s podkategoriemi).
   Formulář: název, typ, nadřazená kategorie, **výběr ikony** (mřížka ~69 monochrom ikon).
   Nové kategorie se objeví i ve formuláři transakce.
-- **Fio – import** (Více → Fio – import) — read-only napojení přes Fio **„API Bankovnictví"
-  token** (uživatel si v internetbankingu vytvoří token „pouhé monitorování účtu"). Stáhne
+- **Fio – import** (Více → **Účty → tapni účet → sekce „Napojení na Fio"**) — read-only napojení přes
+  Fio **„API Bankovnictví" token** (uživatel si v internetbankingu vytvoří token „pouhé monitorování
+  účtu"). Napojení je u konkrétního účtu (ne v menu) — víc účtů, každý vlastní token. Stáhne
   pohyby (`HttpURLConnection` + `org.json`, žádná knihovna navíc), namapuje na záznamy (znaménko
   → výdaj/příjem, `source=FIO`) do zvoleného účtu; **deduplikace přes ID pohybu** (opakovaný sync
   nepřidá duplicity). U karetních plateb vytáhne **obchodníka** z textu („Nákup: ALBERT…" → „ALBERT…").
   Tlačítko „Importovat ukázková data" zkusí import bez tokenu. Vyžádalo oprávnění **INTERNET**.
   **Ověřeno naživo** (424 transakcí za 90 dní, součty sedí). Pozn.: Fio bez silné autorizace dá
   jen data ne starší **90 dní**. (PSD2 cesta jako Wallet nejde — chce vlastní AISP licenci od ČNB.)
-  Obrazovka má dva stavy: **setup** (token + první sync) a **připojeno** (jen info + „Zrušit
-  synchronizaci"); po prvním syncu **běží synchronizace automaticky 1×/den na pozadí** (WorkManager),
-  ruční sync už uživatel nedělá.
+  Napojení je **přímo v detailu účtu** (sekce „Napojení na Fio") — nepřipojený účet má pole na token
+  + „Napojit a synchronizovat", připojený ukazuje poslední sync + „Odpojit od Fio" + „Najít opakované
+  platby". Podporuje **více Fio účtů najednou** (každý vlastní token → vlastní CalmMoney účet; připojení
+  uložená jako seznam v DataStore, migrace ze staršího jediného připojení). Po prvním syncu **běží
+  synchronizace automaticky 1×/den na pozadí** (WorkManager projde všechna připojení), ruční sync už
+  uživatel nedělá.
 - **Detekce trvalých příkazů** (`core/recurring`) — Fio API je nevystavuje, tak je odvozujeme z
   historie (stejná částka + měsíční kadence). Více → Fio → „Najít opakované platby" → seznam návrhů
   s auto-kategorií → potvrzené se založí jako **měsíční plánované platby** (objeví se v „Nadcházející
@@ -64,8 +68,9 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   Výdaje = výdaje vybraného měsíce, **Výhled = výdaje příštího měsíce** (z plánovaných plateb).
   Tap na **Výdaje** → rozpad: **monochromatický prstenec (donut)** + seznam skupin kategorií
   (%/částka/pruh); **klik na kategorii rozbalí její transakce** pod ní (→ detail záznamu).
-- **UI vylepšení dle feedbacku:** spodní lišta = Přehled / **Platby** / **Statistiky** / Více
-  (Záznamy i **Rozpočty** jsou v „Více"), vybraná položka **podtržená** (ne bublina); ve formuláři
+- **UI vylepšení dle feedbacku:** spodní lišta = Přehled / **Platby** / **Statistiky** / **Záznamy** /
+  Více (**Rozpočty** jsou v „Více"; Záznamy mají vlastní položku v liště), vybraná položka
+  **podtržená** (ne bublina); ve formuláři
   transakce je **částka běžné číselné pole** (systémová klávesnice) a **kategorie se vybírá
   na samostatné obrazovce** (řádek → picker „Výběr kategorie" s hierarchií), ne přeplněná mřížka.
   **Stejný picker má i formulář plánované platby** („Nová platba") — dřív tam zůstávala stará
@@ -98,7 +103,7 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   Jediný motiv (bílý papír / černý inkoust) — žádné přepínání motivu.
 - **Komponenty** (`core/designsystem/component`): `CalmCard` (orámovaná), `CalmTopBar`
   (linka místo stínu), `MoneyAmount` (částka se znaménkem), `EmptyState`, `SectionHeader`.
-- **Navigace** (`core/navigation`): spodní lišta (Přehled / Platby / Statistiky / Více),
+- **Navigace** (`core/navigation`): spodní lišta (Přehled / Platby / Statistiky / Záznamy / Více),
   kulatý FAB (+) — na Statistikách skrytý (dole je přepínač měsíce), `NavHost` **bez animací** (E-Ink).
 - **Obrazovky-kostry**: Dashboard, Záznamy, Rozpočty, Více, Nový záznam (placeholdery).
 - **Datová vrstva** (`data/db`): entity `Account`, `Category`, `Record` (+ enumy, konvertory),

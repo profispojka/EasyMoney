@@ -1,6 +1,7 @@
 package cz.calmmoney.core.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -45,7 +46,6 @@ object Routes {
 
     const val CATEGORIES = "categories"
     const val BACKUP = "backup"
-    const val FIO = "fio"
     const val RECURRING = "recurring"
     const val CATEGORY_PICKER_ROUTE = "category_picker/{type}"
     fun categoryPicker(type: String) = "category_picker/$type"
@@ -68,5 +68,6 @@ enum class TopLevelDestination(
     DASHBOARD(Routes.DASHBOARD, R.string.nav_dashboard, Icons.Filled.Home),
     PLANNED(Routes.PLANNED, R.string.nav_planned, Icons.Filled.EventRepeat),
     STATISTICS(Routes.STATISTICS, R.string.nav_statistics, Icons.Filled.BarChart),
+    RECORDS(Routes.RECORDS, R.string.nav_records, Icons.AutoMirrored.Filled.ReceiptLong),
     MORE(Routes.MORE, R.string.nav_more, Icons.Filled.MoreHoriz),
 }

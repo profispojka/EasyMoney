@@ -11,11 +11,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Label
-import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Backup
 import androidx.compose.material.icons.filled.PieChart
-import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,20 +27,16 @@ import cz.calmmoney.core.designsystem.component.CalmTopBar
 
 @Composable
 fun MoreScreen(
-    onOpenRecords: () -> Unit,
     onOpenAccounts: () -> Unit,
     onOpenCategories: () -> Unit,
     onOpenBudgets: () -> Unit,
-    onOpenFio: () -> Unit,
     onOpenBackup: () -> Unit,
 ) {
     Column(Modifier.fillMaxSize()) {
         CalmTopBar("Více")
-        MoreRow(Icons.AutoMirrored.Filled.ReceiptLong, "Záznamy", onOpenRecords)
         MoreRow(Icons.Filled.AccountBalanceWallet, "Účty", onOpenAccounts)
         MoreRow(Icons.AutoMirrored.Filled.Label, "Kategorie", onOpenCategories)
         MoreRow(Icons.Filled.PieChart, "Rozpočty", onOpenBudgets)
-        MoreRow(Icons.Filled.Sync, "Fio – import", onOpenFio)
         MoreRow(Icons.Filled.Backup, "Záloha dat", onOpenBackup)
     }
 }

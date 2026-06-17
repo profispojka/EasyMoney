@@ -11,11 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -32,6 +29,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.component.CalmChip
+import cz.calmmoney.core.designsystem.component.CalmTopBar
 import cz.calmmoney.core.designsystem.component.EmptyState
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.data.db.AccountEntity
@@ -130,7 +128,6 @@ class RecordsViewModel @Inject constructor(
 
 @Composable
 fun RecordsScreen(
-    onBack: () -> Unit,
     onOpenRecord: (String) -> Unit,
     vm: RecordsViewModel = hiltViewModel(),
 ) {
@@ -138,14 +135,7 @@ fun RecordsScreen(
     var showFilter by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zpět") }
-            Text("Záznamy", style = MaterialTheme.typography.titleLarge)
-        }
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        CalmTopBar("Záznamy")
 
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
