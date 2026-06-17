@@ -52,7 +52,8 @@ fun OnboardingScreen(vm: OnboardingViewModel = hiltViewModel()) {
         )
         AccountForm(
             submitLabel = "Začít",
-            onSubmit = { name, type, cents -> vm.createFirstAccount(name, type, cents) },
+            onSubmit = { name, type, cents, _ -> vm.createFirstAccount(name, type, cents) },
+            showBusinessToggle = false,
         )
     }
 }

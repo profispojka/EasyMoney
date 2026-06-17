@@ -21,6 +21,8 @@ data class FioConnection(
     val token: String,
     val accountId: String,
     val lastSyncMillis: Long = 0L,
+    /** Číslo bankovního účtu z Fia (info.accountId) — pro detekci převodů mezi vlastními účty. */
+    val fioAccountNumber: String? = null,
 )
 
 /** Uživatelská nastavení v DataStore (nikoli v Room). */
@@ -101,6 +103,18 @@ class SettingsRepository @Inject constructor(
         }
     }
 
+    /** Zapíše číslo bankovního účtu z Fia (info.accountId) pro dané konto — kvůli převodům mezi účty. */
+    suspend fun setFioAccountNumber(accountId: String, fioAccountNumber: String) {
+        if (fioAccountNumber.isBlank()) return
+        context.settingsDataStore.edit { prefs ->
+            val list = currentList(prefs).map {
+                if (it.accountId == accountId) it.copy(fioAccountNumber = fioAccountNumber) else it
+            }
+            prefs[Keys.FIO_CONNECTIONS] = serialize(list)
+            cleanLegacy(prefs)
+        }
+    }
+
     /** Odpojí jedno Fio konto (naimportované záznamy zůstanou). */
     suspend fun removeFioConnection(accountId: String) {
         context.settingsDataStore.edit { prefs ->
@@ -134,7 +148,8 @@ class SettingsRepository @Inject constructor(
                 JSONObject()
                     .put("token", c.token)
                     .put("accountId", c.accountId)
-                    .put("lastSync", c.lastSyncMillis),
+                    .put("lastSync", c.lastSyncMillis)
+                    .put("fioAccountNumber", c.fioAccountNumber ?: JSONObject.NULL),
             )
         }
         return arr.toString()
@@ -147,7 +162,12 @@ class SettingsRepository @Inject constructor(
             val token = o.optString("token")
             val accId = o.optString("accountId")
             if (token.isBlank() || accId.isBlank()) null
-            else FioConnection(token, accId, o.optLong("lastSync", 0L))
+            else FioConnection(
+                token = token,
+                accountId = accId,
+                lastSyncMillis = o.optLong("lastSync", 0L),
+                fioAccountNumber = o.optString("fioAccountNumber").ifBlank { null },
+            )
         }
     }.getOrDefault(emptyList())
 }

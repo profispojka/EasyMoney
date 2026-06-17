@@ -50,7 +50,12 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   platby". Podporuje **více Fio účtů najednou** (každý vlastní token → vlastní CalmMoney účet; připojení
   uložená jako seznam v DataStore, migrace ze staršího jediného připojení). Po prvním syncu **běží
   synchronizace automaticky 1×/den na pozadí** (WorkManager projde všechna připojení), ruční sync už
-  uživatel nedělá.
+  uživatel nedělá. Účet má příznak **„Podnikatelský účet"** (příchozí platby = příjem „Plat, mzda,
+  fakturace", neřeší se od koho) a **platby mezi dvěma vlastními připojenými účty se berou jako převod**
+  (mimo statistiky) — porovnává se číslo protiúčtu s čísly ostatních připojených Fio účtů. Fio dává oběma
+  stranám interního převodu stejné ID pohybu, proto je dedup po **(účet, ID)** (DB **verze 8**), ať se
+  naimportují obě nohy. **Ověřeno naživo** na 2 reálných účtech (osobní + podnikatelský): 19× převod
+  mimo statistiky, 11× příjem klientů, 7× odvody (OSVČ/FÚ) do Daní.
 - **Detekce trvalých příkazů** (`core/recurring`) — Fio API je nevystavuje, tak je odvozujeme z
   historie (stejná částka + měsíční kadence). Více → Fio → „Najít opakované platby" → seznam návrhů
   s auto-kategorií → potvrzené se založí jako **měsíční plánované platby** (objeví se v „Nadcházející
@@ -91,8 +96,9 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   Vkládá se při vytvoření DB; ikony monochrom — **rozšířený set (~69 ikon)**, takže skupina
   i (téměř) každá podkategorie mají vlastní výstižný glyph (košík, burger, šálek, kufřík,
   pumpa, kostka, …).
-  DB **verze 6** — změna seedu (vč. ikon) se nasadí destruktivní migrací (reseed); od v5→v6
-  ale **nedestruktivní migrace** (`paidThroughEpochDay` u plánovaných plateb), aby reálná data zůstala.
+  DB **verze 8** — změna seedu (vč. ikon) se nasadí destruktivní migrací (reseed); od v5 ale
+  **nedestruktivní migrace** (v5→6 `paidThroughEpochDay`, v6→7 `isBusiness`, v7→8 dedup index
+  `(účet, ID pohybu)`), aby reálná data zůstala.
 
 ## Co je hotové (Fáze 0)
 - **Gradle projekt** (Kotlin DSL, version catalog `gradle/libs.versions.toml`, wrapper 8.11.1).

@@ -36,6 +36,7 @@ import cz.calmmoney.core.designsystem.component.TrendChart
 import cz.calmmoney.core.time.PlannedPayments
 import cz.calmmoney.data.db.RecordType
 import cz.calmmoney.data.repo.AccountRepository
+import cz.calmmoney.data.repo.CategorizationRepository
 import cz.calmmoney.data.repo.CategoryRepository
 import cz.calmmoney.data.repo.PlannedPaymentRepository
 import cz.calmmoney.data.repo.RecordRepository
@@ -86,13 +87,17 @@ class DashboardViewModel @Inject constructor(
     records: RecordRepository,
     categories: CategoryRepository,
     planned: PlannedPaymentRepository,
+    private val categorization: CategorizationRepository,
 ) : ViewModel() {
 
     private val periodFlow = MutableStateFlow(TrendPeriod.MONTHS_6)
 
     init {
-        // Napáruj plánované platby na existující transakce i bez nového Fio syncu.
-        viewModelScope.launch { planned.reconcileAll() }
+        viewModelScope.launch {
+            // Dožeň nezařazené záznamy (po vylepšení pravidel) a napáruj plánované platby.
+            categorization.recategorizeUncategorized()
+            planned.reconcileAll()
+        }
     }
 
     fun setPeriod(period: TrendPeriod) {

@@ -34,6 +34,7 @@ class AccountRepository @Inject constructor(private val dao: AccountDao) {
         type: AccountType,
         initialBalanceMinor: Long,
         icon: String,
+        isBusiness: Boolean = false,
     ): String {
         val id = newId()
         val ts = now()
@@ -44,6 +45,7 @@ class AccountRepository @Inject constructor(private val dao: AccountDao) {
                 type = type,
                 initialBalanceMinor = initialBalanceMinor,
                 icon = icon,
+                isBusiness = isBusiness,
                 createdAt = ts,
                 updatedAt = ts,
             )
@@ -60,6 +62,7 @@ class AccountRepository @Inject constructor(private val dao: AccountDao) {
         name: String,
         type: AccountType,
         initialBalanceMinor: Long,
+        isBusiness: Boolean,
     ) {
         val existing = dao.getById(id) ?: return
         dao.update(
@@ -67,6 +70,7 @@ class AccountRepository @Inject constructor(private val dao: AccountDao) {
                 name = name.trim().ifBlank { "Účet" },
                 type = type,
                 initialBalanceMinor = initialBalanceMinor,
+                isBusiness = isBusiness,
                 updatedAt = now(),
             )
         )

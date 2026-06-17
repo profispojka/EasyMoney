@@ -6,10 +6,13 @@ import cz.calmmoney.core.fio.FioApiClient
 import cz.calmmoney.core.fio.FioFetchResult
 import cz.calmmoney.core.fio.FioParser
 import cz.calmmoney.core.fio.FioTx
+import cz.calmmoney.data.db.AccountDao
 import cz.calmmoney.data.db.RecordDao
 import cz.calmmoney.data.db.RecordEntity
 import cz.calmmoney.data.db.RecordSource
 import cz.calmmoney.data.db.RecordType
+import cz.calmmoney.data.settings.SettingsRepository
+import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -35,8 +38,10 @@ sealed interface FioSyncResult {
 class FioRepository @Inject constructor(
     private val client: FioApiClient,
     private val recordDao: RecordDao,
+    private val accountDao: AccountDao,
     private val categorization: CategorizationRepository,
     private val planned: PlannedPaymentRepository,
+    private val settings: SettingsRepository,
 ) {
     private val zone: ZoneId = ZoneId.systemDefault()
 
@@ -50,8 +55,11 @@ class FioRepository @Inject constructor(
         val from = to.minusDays(daysBack)
         return when (val r = client.fetchPeriods(token, from, to)) {
             is FioFetchResult.Success -> importJson(r.json, accountId).also {
-                // Po importu zkus napárovat plánované platby na nové transakce (auto „zaplaceno").
-                if (it is FioSyncResult.Success) planned.reconcileAll()
+                if (it is FioSyncResult.Success) {
+                    // Dožeň i starší nezařazené (po vylepšení seed pravidel) a napáruj plánované platby.
+                    categorization.recategorizeUncategorized()
+                    planned.reconcileAll()
+                }
             }
             FioFetchResult.RateLimited -> FioSyncResult.RateLimited
             is FioFetchResult.HttpError -> when (r.code) {
@@ -74,6 +82,16 @@ class FioRepository @Inject constructor(
         val learned = categorization.learnedSorted()
         val ownerNorm = ownerOf(txs)
 
+        // Číslo tohoto účtu z Fia (pro budoucí detekci převodů mezi vlastními účty) ulož.
+        FioParser.accountNumber(json)?.let { settings.setFioAccountNumber(accountId, it) }
+        // Čísla OSTATNÍCH připojených Fio účtů — platba na ně = převod mezi vlastními účty (ignoruje se ve statistikách).
+        val otherAccounts = settings.fioConnections.first()
+            .filter { it.accountId != accountId }
+            .mapNotNull { it.fioAccountNumber }
+            .map { normAcc(it) }
+            .filter { it.isNotEmpty() }
+        val isBusiness = accountDao.getById(accountId)?.isBusiness == true
+
         var added = 0
         var categorized = 0
         for (t in txs) {
@@ -92,6 +110,19 @@ class FioRepository @Inject constructor(
                 Categorizer.Result.Transfer -> { recType = RecordType.TRANSFER; transferOut = minor < 0 }
                 is Categorizer.Result.Category -> categoryId = res.id
                 Categorizer.Result.None -> {}
+            }
+
+            // Převod mezi vlastními účty (protiúčet = jiný připojený Fio účet) → TRANSFER, mimo statistiky.
+            val counter = normAcc(t.counterAccount)
+            if (recType != RecordType.TRANSFER && counter.isNotEmpty() && otherAccounts.any { sameAccount(counter, it) }) {
+                recType = RecordType.TRANSFER
+                transferOut = minor < 0
+                categoryId = null
+            }
+
+            // Podnikatelský účet: každý příchozí pohyb (co není převod) ber jako příjem „Plat, mzda, fakturace".
+            if (isBusiness && recType == RecordType.INCOME) {
+                categoryId = "income_wage"
             }
 
             val rec = RecordEntity(
@@ -115,6 +146,16 @@ class FioRepository @Inject constructor(
             }
         }
         return FioSyncResult.Success(added, txs.size, categorized)
+    }
+
+    /** Číslo účtu jen číslice (bez kódu banky za „/"). „2901229792/2010" → „2901229792". */
+    private fun normAcc(s: String?): String = s?.substringBefore('/')?.filter { it.isDigit() } ?: ""
+
+    /** Shoda čísel účtů (toleruje předčíslí — porovná shodu nebo koncovku). */
+    private fun sameAccount(a: String, b: String): Boolean {
+        if (a.isEmpty() || b.isEmpty()) return false
+        if (a == b) return true
+        return minOf(a.length, b.length) >= 6 && (a.endsWith(b) || b.endsWith(a))
     }
 
     /** Majitel účtu = nejčastější „Provedl" (normalizovaně) — pro detekci vlastních převodů. */

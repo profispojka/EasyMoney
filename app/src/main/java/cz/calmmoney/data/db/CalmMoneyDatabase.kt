@@ -12,7 +12,7 @@ import androidx.room.TypeConverters
         BudgetEntity::class,
         PlannedPaymentEntity::class,
     ],
-    version = 6,
+    version = 8,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)

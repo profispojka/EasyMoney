@@ -29,11 +29,29 @@ object DatabaseModule {
         }
     }
 
+    // v6 → v7: příznak podnikatelského účtu (příchozí platby = příjem). Nedestruktivní.
+    private val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE accounts ADD COLUMN isBusiness INTEGER NOT NULL DEFAULT 0")
+        }
+    }
+
+    // v7 → v8: dedup ID pohybu jen v rámci účtu (interní převod má na obou účtech stejné ID).
+    private val MIGRATION_7_8 = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP INDEX IF EXISTS index_records_fioTransactionId")
+            db.execSQL(
+                "CREATE UNIQUE INDEX IF NOT EXISTS index_records_accountId_fioTransactionId " +
+                    "ON records (accountId, fioTransactionId)",
+            )
+        }
+    }
+
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): CalmMoneyDatabase =
         Room.databaseBuilder(context, CalmMoneyDatabase::class.java, CalmMoneyDatabase.NAME)
-            .addMigrations(MIGRATION_5_6)
+            .addMigrations(MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)

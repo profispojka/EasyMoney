@@ -35,8 +35,8 @@ class FioApiClient @Inject constructor() {
             try {
                 val conn = (URL(url).openConnection() as HttpURLConnection).apply {
                     requestMethod = "GET"
-                    connectTimeout = 20_000
-                    readTimeout = 30_000
+                    connectTimeout = 30_000
+                    readTimeout = 90_000 // velký výpis (stovky pohybů) na pomalé síti
                     setRequestProperty("Accept", "application/json")
                 }
                 try {

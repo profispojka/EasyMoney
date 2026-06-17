@@ -51,12 +51,12 @@ class AddAccountViewModel @Inject constructor(
         (if (accountId != null) accounts.observeById(accountId) else flowOf(null))
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
-    fun save(name: String, type: AccountType, initialCents: Long, onDone: () -> Unit) {
+    fun save(name: String, type: AccountType, initialCents: Long, isBusiness: Boolean, onDone: () -> Unit) {
         viewModelScope.launch {
             if (accountId != null) {
-                accounts.updateAccount(accountId, name, type, initialCents)
+                accounts.updateAccount(accountId, name, type, initialCents, isBusiness)
             } else {
-                accounts.create(name.ifBlank { "Účet" }, type, initialCents, "wallet")
+                accounts.create(name.ifBlank { "Účet" }, type, initialCents, "wallet", isBusiness)
             }
             onDone()
         }
@@ -95,10 +95,11 @@ fun AddAccountScreen(
                 val a = account
                 AccountForm(
                     submitLabel = "Uložit",
-                    onSubmit = { name, type, cents -> vm.save(name, type, cents, onClose) },
+                    onSubmit = { name, type, cents, isBusiness -> vm.save(name, type, cents, isBusiness, onClose) },
                     initialName = a?.name ?: "",
                     initialType = a?.type ?: AccountType.CASH,
                     initialBalanceText = a?.let { Money.toPlainAmount(it.initialBalanceMinor) } ?: "",
+                    initialIsBusiness = a?.isBusiness ?: false,
                 )
 
                 // Fio napojení patří ke konkrétnímu účtu — jen u už existujícího.

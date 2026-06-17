@@ -15,6 +15,8 @@ data class AccountEntity(
     val icon: String,
     val excludeFromStats: Boolean = false,
     val archived: Boolean = false,
+    // Podnikatelský účet: všechny příchozí platby se berou jako příjem (kategorie „Plat, mzda, fakturace").
+    val isBusiness: Boolean = false,
     val sortOrder: Int = 0,
     val createdAt: Long,
     val updatedAt: Long,
@@ -40,7 +42,9 @@ data class CategoryEntity(
         Index("accountId"),
         Index("categoryId"),
         Index("dateTime"),
-        Index(value = ["fioTransactionId"], unique = true),
+        // Unikát na (účet, ID pohybu): Fio dává oběma stranám interního převodu stejné ID,
+        // takže globální unikát by druhou nohu zahodil. Dedup tak platí jen v rámci účtu.
+        Index(value = ["accountId", "fioTransactionId"], unique = true),
     ],
 )
 data class RecordEntity(

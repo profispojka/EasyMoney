@@ -68,6 +68,8 @@ object SeedRules {
         "nevjesta" to "food_restaurant",
         "callett" to "food_restaurant",
         "hasib" to "food_restaurant",
+        "foodmania" to "food_restaurant",
+        "makalu" to "food_restaurant",
         // --- Bar, kavárna ---
         "cafe" to "food_bar",
         "kavarna" to "food_bar",
@@ -161,6 +163,7 @@ object SeedRules {
         "playstation" to "comm_software",
         "steam" to "comm_software",
         "icloud" to "comm_software",
+        "higgsfield" to "comm_software",
         // --- Práce / Podnikání (dev/AI nástroje) ---
         "anthropic" to "work",
         "claude" to "work",
@@ -171,7 +174,6 @@ object SeedRules {
         "firecrawl" to "work",
         "github" to "work",
         "google cloud" to "work",
-        "higgsfield" to "work",
         "idoklad" to "work",
         "cloudflare" to "work",
         "openrouter" to "work",
@@ -182,13 +184,16 @@ object SeedRules {
         "spotify" to "life_tv",
         "hbo" to "life_tv",
         "disney" to "life_tv",
-        "ceska televize" to "life_tv",
-        "vypalne ceska" to "life_tv",
+        // ČT/ČRo poplatek je povinný → Daně (na přání uživatele, ne „Televize").
+        "ceska televize" to "financial_taxes",
+        "vypalne ceska" to "financial_taxes",
         // --- Elektronika ---
         "alza" to "shopping_electronics",
         "planeo" to "shopping_electronics",
         "datart" to "shopping_electronics",
         "mironet" to "shopping_electronics",
+        "media markt" to "shopping_electronics",
+        "mediamarkt" to "shopping_electronics",
         // --- Domácnost, zahrada ---
         "ikea" to "shopping_home_garden",
         "obi " to "shopping_home_garden",
@@ -196,6 +201,8 @@ object SeedRules {
         "bauhaus" to "shopping_home_garden",
         "jysk" to "shopping_home_garden",
         "mountfield" to "shopping_home_garden",
+        "castorama" to "shopping_home_garden",
+        "leroy merlin" to "shopping_home_garden",
         // --- Oděvy a obuv ---
         "tk maxx" to "shopping_clothes",
         "zara" to "shopping_clothes",
@@ -204,7 +211,6 @@ object SeedRules {
         "sinsay" to "shopping_clothes",
         "primark" to "shopping_clothes",
         "zalando" to "shopping_clothes",
-        "makalu" to "shopping_clothes",
         // --- Sport, fitness ---
         "decathlon" to "life_sport",
         "form factory" to "life_sport",
@@ -300,6 +306,30 @@ object SeedRules {
         "futurum" to "shopping_free_time",
         "avion" to "shopping_free_time",
         "temu" to "shopping_free_time",
+        "allegro" to "shopping_free_time",
+        "aliexpress" to "shopping_free_time",
+        // --- Holičství, kadeřnictví, kosmetika (wellness, krása) ---
+        "barber" to "life_wellness",
+        "kadernic" to "life_wellness",
+        "holicstvi" to "life_wellness",
+        "frizer" to "life_wellness",
+        "kosmeticky salon" to "life_wellness",
+        "manikura" to "life_wellness",
+        // --- Zdravotní a sociální pojištění, daně → Daně (povinné odvody) ---
+        // Pozn.: „zdravotní pojišťovna/pojištění" má přednost před obecnou „pojistovna" (delší klíč).
+        "zdravotni pojist" to "financial_taxes",
+        "revirni bratrska" to "financial_taxes",
+        "socialniho zabezpeceni" to "financial_taxes",
+        "socialni zabezpeceni" to "financial_taxes",
+        "socialni pojisteni" to "financial_taxes",
+        "socialni osvc" to "financial_taxes",
+        "zdravotni osvc" to "financial_taxes",
+        "financni urad" to "financial_taxes",
+        "zalohy fu" to "financial_taxes",
+        "rbp" to "financial_taxes",
+        "vzp" to "financial_taxes",
+        "ossz" to "financial_taxes",
+        "cssz" to "financial_taxes",
     )
 
     /** Nejdelší (nejspecifičtější) klíče první, ať „auto pojisteni" vyhraje nad „pojistovna". */

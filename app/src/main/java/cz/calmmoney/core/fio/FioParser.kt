@@ -39,6 +39,12 @@ object FioParser {
         return if (d.isNaN()) null else d
     }
 
+    /** Číslo vlastního účtu z výpisu (info.accountId) — pro detekci převodů mezi vlastními účty. */
+    fun accountNumber(json: String): String? = runCatching {
+        JSONObject(json).optJSONObject("accountStatement")
+            ?.optJSONObject("info")?.optString("accountId")?.trim()?.ifBlank { null }
+    }.getOrNull()
+
     fun parse(json: String): List<FioTx> {
         val stmt = JSONObject(json).optJSONObject("accountStatement") ?: return emptyList()
         val arr = stmt.optJSONObject("transactionList")?.optJSONArray("transaction") ?: return emptyList()
