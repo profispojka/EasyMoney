@@ -145,6 +145,15 @@ class FioRepository @Inject constructor(
                 if (categoryId != null || recType == RecordType.TRANSFER) categorized++
             }
         }
+
+        // Sjednoť zobrazený zůstatek se skutečným zůstatkem z banky (Fio `closingBalance`):
+        // dopočítej počáteční zůstatek tak, aby `initial + Σ(záznamy) = closingBalance`. Tím sedí
+        // i přesto, že importujeme jen 90 dní a počáteční zůstatek byl jen odhad.
+        FioParser.closingBalanceMinor(json)?.let { closingMinor ->
+            val signed = recordDao.signedSumForAccount(accountId)
+            accountDao.setInitialBalance(accountId, closingMinor - signed, System.currentTimeMillis())
+        }
+
         return FioSyncResult.Success(added, txs.size, categorized)
     }
 

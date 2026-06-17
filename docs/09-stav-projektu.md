@@ -55,7 +55,10 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   (mimo statistiky) — porovnává se číslo protiúčtu s čísly ostatních připojených Fio účtů. Fio dává oběma
   stranám interního převodu stejné ID pohybu, proto je dedup po **(účet, ID)** (DB **verze 8**), ať se
   naimportují obě nohy. **Ověřeno naživo** na 2 reálných účtech (osobní + podnikatelský): 19× převod
-  mimo statistiky, 11× příjem klientů, 7× odvody (OSVČ/FÚ) do Daní.
+  mimo statistiky, 11× příjem klientů, 7× odvody (OSVČ/FÚ) do Daní. Zobrazený **zůstatek = skutečný
+  zůstatek z banky** (Fio `closingBalance`) — při syncu se dopočítá počáteční zůstatek, ať sedí i přes
+  90denní okno. **Fio účet je jen pro sync** — ruční záznamy do něj nejdou (není v nabídce účtů u „Nový
+  záznam", „Zaplatit teď" u jeho plánovaných plateb je skryté), aby částky seděly s internetbankingem.
 - **Detekce trvalých příkazů** (`core/recurring`) — Fio API je nevystavuje, tak je odvozujeme z
   historie (stejná částka + měsíční kadence). Více → Fio → „Najít opakované platby" → seznam návrhů
   s auto-kategorií → potvrzené se založí jako **měsíční plánované platby** (objeví se v „Nadcházející
@@ -71,8 +74,9 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
 - **Statistiky** (3. pozice spodní lišty, vzor Wallet) — karty **Zůstatek / Výdaje / Příjmy /
   Cash flow / Výhled** za vybraný měsíc; dole **přepínač měsíce** (`<` / „Tento měsíc ▼" / `>`).
   Výdaje = výdaje vybraného měsíce, **Výhled = výdaje příštího měsíce** (z plánovaných plateb).
-  Tap na **Výdaje** → rozpad: **monochromatický prstenec (donut)** + seznam skupin kategorií
-  (%/částka/pruh); **klik na kategorii rozbalí její transakce** pod ní (→ detail záznamu).
+  Tap na **Výdaje** → rozpad po **skupinách kategorií** (%/částka/pruh); klik na kategorii rozbalí
+  její transakce. Tap na **Příjmy** → rovnou **seznam jednotlivých příjmů** (záznamů, ne kategorií)
+  za měsíc (`StatisticsIncomeScreen`). Obojí → detail záznamu.
 - **UI vylepšení dle feedbacku:** spodní lišta = Přehled / **Platby** / **Statistiky** / **Záznamy** /
   Více (**Rozpočty** jsou v „Více"; Záznamy mají vlastní položku v liště), vybraná položka
   **podtržená** (ne bublina); ve formuláři

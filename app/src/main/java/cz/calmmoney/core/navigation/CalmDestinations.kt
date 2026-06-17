@@ -26,6 +26,9 @@ object Routes {
     const val STATISTICS_EXPENSES_ROUTE = "statistics_expenses/{ym}"
     fun statisticsExpenses(ym: String) = "statistics_expenses/$ym"
 
+    const val STATISTICS_INCOME_ROUTE = "statistics_income/{ym}"
+    fun statisticsIncome(ym: String) = "statistics_income/$ym"
+
     // add_record slouží i pro editaci (volitelný arg recordId).
     const val ADD_RECORD_ROUTE = "add_record?recordId={recordId}"
     fun addRecordEdit(id: String) = "add_record?recordId=$id"

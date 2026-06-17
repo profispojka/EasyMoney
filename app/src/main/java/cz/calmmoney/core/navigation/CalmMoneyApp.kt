@@ -45,6 +45,7 @@ import cz.calmmoney.feature.planned.PlannedPaymentsScreen
 import cz.calmmoney.feature.records.RecordsScreen
 import cz.calmmoney.feature.recurring.RecurringScreen
 import cz.calmmoney.feature.statistics.StatisticsExpensesScreen
+import cz.calmmoney.feature.statistics.StatisticsIncomeScreen
 import cz.calmmoney.feature.statistics.StatisticsScreen
 
 /** Kořen: rozhodne mezi onboardingem a hlavní aplikací podle existence účtu. */
@@ -111,6 +112,7 @@ private fun MainScaffold() {
             composable(Routes.STATISTICS) {
                 StatisticsScreen(
                     onOpenExpenses = { ym -> navController.navigate(Routes.statisticsExpenses(ym)) },
+                    onOpenIncome = { ym -> navController.navigate(Routes.statisticsIncome(ym)) },
                 )
             }
             composable(
@@ -118,6 +120,15 @@ private fun MainScaffold() {
                 arguments = listOf(navArgument("ym") { type = NavType.StringType }),
             ) {
                 StatisticsExpensesScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenRecord = { navController.navigate(Routes.recordDetail(it)) },
+                )
+            }
+            composable(
+                route = Routes.STATISTICS_INCOME_ROUTE,
+                arguments = listOf(navArgument("ym") { type = NavType.StringType }),
+            ) {
+                StatisticsIncomeScreen(
                     onBack = { navController.popBackStack() },
                     onOpenRecord = { navController.navigate(Routes.recordDetail(it)) },
                 )

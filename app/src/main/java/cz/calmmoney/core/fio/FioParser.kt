@@ -45,6 +45,15 @@ object FioParser {
             ?.optJSONObject("info")?.optString("accountId")?.trim()?.ifBlank { null }
     }.getOrNull()
 
+    /** Skutečný (běžný) zůstatek účtu ke konci výpisu v minor units — z info.closingBalance. */
+    fun closingBalanceMinor(json: String): Long? = runCatching {
+        val info = JSONObject(json).optJSONObject("accountStatement")?.optJSONObject("info") ?: return null
+        if (info.isNull("closingBalance")) return null
+        // Přes string, ať nezavedeme chybu z double (16407.51 vs 16407.5099…).
+        java.math.BigDecimal(info.get("closingBalance").toString())
+            .movePointRight(2).setScale(0, java.math.RoundingMode.HALF_UP).toLong()
+    }.getOrNull()
+
     fun parse(json: String): List<FioTx> {
         val stmt = JSONObject(json).optJSONObject("accountStatement") ?: return emptyList()
         val arr = stmt.optJSONObject("transactionList")?.optJSONArray("transaction") ?: return emptyList()

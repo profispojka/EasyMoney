@@ -45,5 +45,5 @@ fun CalmTopBar(
             )
         }
     }
-    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+    HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onBackground)
 }

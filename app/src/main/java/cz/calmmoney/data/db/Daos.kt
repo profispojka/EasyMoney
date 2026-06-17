@@ -61,6 +61,10 @@ interface AccountDao {
     @Update
     suspend fun update(account: AccountEntity)
 
+    /** Nastaví počáteční zůstatek (po Fio syncu dopočítaný, ať zobrazený = skutečný zůstatek z banky). */
+    @Query("UPDATE accounts SET initialBalanceMinor = :initial, updatedAt = :ts WHERE id = :id")
+    suspend fun setInitialBalance(id: String, initial: Long, ts: Long)
+
     @Delete
     suspend fun delete(account: AccountEntity)
 }
@@ -147,6 +151,20 @@ interface RecordDao {
     /** Idempotentní vložení Fio záznamu (dedup přes unikátní fioTransactionId). */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertIgnore(record: RecordEntity): Long
+
+    /** Znaménkový součet záznamů účtu (stejná logika jako balance dotaz) — pro dopočet zůstatku z Fia. */
+    @Query(
+        """
+        SELECT IFNULL(SUM(CASE
+          WHEN type = 'INCOME' THEN amountMinor
+          WHEN type = 'EXPENSE' THEN -amountMinor
+          WHEN type = 'TRANSFER' AND transferOut = 0 THEN amountMinor
+          WHEN type = 'TRANSFER' AND transferOut = 1 THEN -amountMinor
+          ELSE 0 END), 0)
+        FROM records WHERE accountId = :accountId
+        """
+    )
+    suspend fun signedSumForAccount(accountId: String): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun upsert(record: RecordEntity)

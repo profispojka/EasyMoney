@@ -112,6 +112,7 @@ class StatisticsViewModel @Inject constructor(
 @Composable
 fun StatisticsScreen(
     onOpenExpenses: (String) -> Unit,
+    onOpenIncome: (String) -> Unit,
     vm: StatisticsViewModel = hiltViewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
@@ -122,7 +123,7 @@ fun StatisticsScreen(
         Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
             StatRow("Zůstatek", state.netWorthMinor, withSign = false)
             StatRow("Výdaje", -state.expenseMinor, onClick = { onOpenExpenses(state.ym.toString()) })
-            StatRow("Příjmy", state.incomeMinor)
+            StatRow("Příjmy", state.incomeMinor, onClick = { onOpenIncome(state.ym.toString()) })
             StatRow("Cash flow", state.cashflowMinor)
             StatRow("Výhled", -state.forecastMinor, subtitle = "výdaje příští měsíc")
         }

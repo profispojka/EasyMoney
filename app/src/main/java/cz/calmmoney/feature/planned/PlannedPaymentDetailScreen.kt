@@ -31,6 +31,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cz.calmmoney.core.designsystem.component.CalmConfirmSheet
 import cz.calmmoney.core.designsystem.component.CalmPrimaryButton
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.core.time.PlannedPayments
@@ -40,6 +41,7 @@ import cz.calmmoney.data.repo.AccountRepository
 import cz.calmmoney.data.repo.CategoryRepository
 import cz.calmmoney.data.repo.PlannedPaymentRepository
 import cz.calmmoney.data.repo.RecordRepository
+import cz.calmmoney.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -58,6 +60,8 @@ data class PlannedDetailUiState(
     val frequencyLabel: String = "",
     val nextDateText: String = "",
     val endText: String = "",
+    /** Účet platby se synchronizuje z Fia → „Zaplatit teď" (ruční záznam) skryj. */
+    val accountIsFioSynced: Boolean = false,
 )
 
 @HiltViewModel
@@ -66,14 +70,15 @@ class PlannedPaymentDetailViewModel @Inject constructor(
     private val records: RecordRepository,
     accounts: AccountRepository,
     categories: CategoryRepository,
+    settings: SettingsRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val plannedId: String = checkNotNull(savedStateHandle["plannedId"])
 
     val state: StateFlow<PlannedDetailUiState> = combine(
-        planned.observeById(plannedId), accounts.observeActive(), categories.observeAll(),
-    ) { p, accs, cats ->
+        planned.observeById(plannedId), accounts.observeActive(), categories.observeAll(), settings.fioConnections,
+    ) { p, accs, cats, conns ->
         if (p == null) return@combine PlannedDetailUiState()
         val next = PlannedPayments.nextOccurrence(p.startEpochDay, p.frequencyUnit, p.frequencyCount, p.endEpochDay)
         PlannedDetailUiState(
@@ -85,6 +90,7 @@ class PlannedPaymentDetailViewModel @Inject constructor(
             frequencyLabel = PlannedPayments.frequencyLabel(p.frequencyUnit, p.frequencyCount),
             nextDateText = next?.let { PlannedPayments.formatDate(it) } ?: "Ukončeno",
             endText = p.endEpochDay?.let { PlannedPayments.formatDate(LocalDate.ofEpochDay(it)) } ?: "Bez konce",
+            accountIsFioSynced = conns.any { it.accountId == p.accountId },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlannedDetailUiState())
 
@@ -152,7 +158,10 @@ fun PlannedPaymentDetailScreen(
 
             HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
-            CalmPrimaryButton("Zaplatit teď", onClick = { vm.payNow(onBack) })
+            // U Fio účtu se platba zaúčtuje sama při synchronizaci → „Zaplatit teď" (ruční záznam) nenabízej.
+            if (!state.accountIsFioSynced) {
+                CalmPrimaryButton("Zaplatit teď", onClick = { vm.payNow(onBack) })
+            }
             OutlinedButton(onClick = { onEdit(payment.id) }, shape = MaterialTheme.shapes.small, modifier = Modifier.fillMaxWidth().height(52.dp)) {
                 Text("Upravit", style = MaterialTheme.typography.titleMedium)
             }
@@ -163,12 +172,11 @@ fun PlannedPaymentDetailScreen(
     }
 
     if (confirmDelete && payment != null) {
-        AlertDialog(
-            onDismissRequest = { confirmDelete = false },
-            title = { Text("Smazat plánovanou platbu?") },
-            text = { Text("Platba „${payment.name}“ bude odstraněna.") },
-            confirmButton = { TextButton(onClick = { confirmDelete = false; vm.delete(onBack) }) { Text("Smazat") } },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Zrušit") } },
+        CalmConfirmSheet(
+            title = "Smazat plánovanou platbu?",
+            confirmLabel = "Smazat",
+            onConfirm = { confirmDelete = false; vm.delete(onBack) },
+            onDismiss = { confirmDelete = false },
         )
     }
 }

@@ -27,12 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.calmmoney.core.designsystem.component.CalmCard
+import cz.calmmoney.core.designsystem.component.CalmConfirmSheet
 import cz.calmmoney.core.designsystem.component.CalmTopBar
 import cz.calmmoney.core.designsystem.component.MoneyAmount
 import cz.calmmoney.core.designsystem.component.SectionHeader
@@ -156,7 +158,11 @@ fun PlannedPaymentsScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(row.payment.name, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                row.payment.name,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold,
+                            )
                             Text(
                                 "${row.frequencyLabel} · ${row.nextDateText}",
                                 style = MaterialTheme.typography.labelMedium,
@@ -176,12 +182,11 @@ fun PlannedPaymentsScreen(
 
     val p = toDelete
     if (p != null) {
-        AlertDialog(
-            onDismissRequest = { toDelete = null },
-            title = { Text("Smazat plánovanou platbu?") },
-            text = { Text("Platba „${p.name}“ bude odstraněna.") },
-            confirmButton = { TextButton(onClick = { vm.delete(p); toDelete = null }) { Text("Smazat") } },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Zrušit") } },
+        CalmConfirmSheet(
+            title = "Smazat plánovanou platbu?",
+            confirmLabel = "Smazat",
+            onConfirm = { vm.delete(p); toDelete = null },
+            onDismiss = { toDelete = null },
         )
     }
 }

@@ -1,6 +1,7 @@
 package cz.calmmoney.feature.records
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material3.HorizontalDivider
@@ -17,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -133,6 +136,9 @@ fun RecordsScreen(
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
     var showFilter by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    // Po otevření filtru roluj nahoru, ať je panel vidět (LazyColumn jinak drží pozici).
+    LaunchedEffect(showFilter) { if (showFilter) listState.scrollToItem(0) }
 
     Column(Modifier.fillMaxSize()) {
         CalmTopBar("Záznamy")
@@ -157,19 +163,31 @@ fun RecordsScreen(
             )
         }
 
-        if (showFilter) {
-            FilterPanel(state, vm)
-        }
         HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
-        if (state.groups.isEmpty()) {
-            EmptyState(
-                icon = Icons.AutoMirrored.Filled.ReceiptLong,
-                title = if (state.filter.isActive) "Nic neodpovídá filtru" else "Žádné záznamy",
-                subtitle = if (state.filter.isActive) "Zkus upravit nebo vyčistit filtr." else "Příjmy a výdaje se objeví tady.",
-            )
-        } else {
-            LazyColumn(Modifier.fillMaxSize()) {
+        // Filtr je hlavička LazyColumnu, takže scrolluje spolu se seznamem (i když má hodně kategorií).
+        LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+            if (showFilter) {
+                item(key = "filter") {
+                    FilterPanel(state, vm)
+                    HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+                }
+            }
+
+            if (state.groups.isEmpty()) {
+                item(key = "empty") {
+                    Box(
+                        Modifier.fillParentMaxSize().padding(24.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        EmptyState(
+                            icon = Icons.AutoMirrored.Filled.ReceiptLong,
+                            title = if (state.filter.isActive) "Nic neodpovídá filtru" else "Žádné záznamy",
+                            subtitle = if (state.filter.isActive) "Zkus upravit nebo vyčistit filtr." else "Příjmy a výdaje se objeví tady.",
+                        )
+                    }
+                }
+            } else {
                 state.groups.forEach { group ->
                     item(key = "h_${group.label}") {
                         Surface(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.fillMaxWidth()) {

@@ -52,6 +52,7 @@ import cz.calmmoney.data.repo.AccountRepository
 import cz.calmmoney.data.repo.CategorizationRepository
 import cz.calmmoney.data.repo.CategoryRepository
 import cz.calmmoney.data.repo.RecordRepository
+import cz.calmmoney.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -79,6 +80,8 @@ data class AddRecordUiState(
     val selectedCategoryId: String? = null,
     val note: String = "",
     val dateTimeMillis: Long = 0L,
+    /** Všechny účty se synchronizují z Fia → ruční záznam nelze přidat (jen sync). */
+    val allAccountsSynced: Boolean = false,
 ) {
     val amountMinor: Long get() = Money.parseToMinor(amountText) ?: 0L
     val canSave: Boolean
@@ -95,6 +98,7 @@ data class PendingSiblings(val categoryId: String, val payee: String, val count:
 class AddRecordViewModel @Inject constructor(
     accountsRepo: AccountRepository,
     categoriesRepo: CategoryRepository,
+    settings: SettingsRepository,
     private val records: RecordRepository,
     private val categorization: CategorizationRepository,
     savedStateHandle: androidx.lifecycle.SavedStateHandle,
@@ -139,23 +143,29 @@ class AddRecordViewModel @Inject constructor(
     }
 
     val state: StateFlow<AddRecordUiState> = combine(
-        form, accountsRepo.observeActive(), categoriesRepo.observeAll(),
-    ) { f, accs, cats ->
+        form, accountsRepo.observeActive(), categoriesRepo.observeAll(), settings.fioConnections,
+    ) { f, accs, cats, conns ->
         val typeCats = when (f.type) {
             RecordType.INCOME -> cats.filter { it.type.name == "INCOME" }
             RecordType.EXPENSE -> cats.filter { it.type.name == "EXPENSE" }
             RecordType.TRANSFER -> emptyList()
         }
+        // Do účtu synchronizovaného z Fia nejdou ruční záznamy (jen sync) — schovej ho z nabídky.
+        // Při editaci stávajícího záznamu ponech jeho aktuální účet, ať editace nerozbije.
+        val fioAccountIds = conns.map { it.accountId }.toSet()
+        val available = accs.filter { it.id !in fioAccountIds || it.id == f.accountId }
         AddRecordUiState(
             type = f.type,
             amountText = f.amountText,
-            accounts = accs,
+            accounts = available,
             categories = typeCats,
-            selectedAccountId = f.accountId ?: accs.firstOrNull()?.id,
-            selectedToAccountId = f.toAccountId ?: accs.getOrNull(1)?.id,
+            selectedAccountId = f.accountId ?: available.firstOrNull()?.id,
+            selectedToAccountId = f.toAccountId ?: available.getOrNull(1)?.id,
             selectedCategoryId = f.categoryId,
             note = f.note,
             dateTimeMillis = f.dateTimeMillis,
+            // Nový záznam, ale všechny účty jsou Fio-synchronizované → ruční záznam nejde.
+            allAccountsSynced = editingId == null && available.isEmpty() && accs.isNotEmpty(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AddRecordUiState())
 
@@ -279,6 +289,16 @@ fun AddRecordScreen(
             Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            if (state.allAccountsSynced) {
+                Text(
+                    "Tvůj účet se synchronizuje z Fia — plní se automaticky z banky, takže ruční záznamy do " +
+                        "něj nejdou (aby částky seděly s internetbankingem). Pro ruční zadávání si vytvoř další " +
+                        "účet, např. hotovostní (Více → Účty).",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
             // Typ
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 RecordType.entries.forEach { t ->

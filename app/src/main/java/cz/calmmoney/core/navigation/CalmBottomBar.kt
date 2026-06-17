@@ -52,7 +52,7 @@ fun CalmBottomBar(navController: NavHostController) {
                     val selected = currentDestination?.hierarchy?.any { it.route == destination.route } == true
                     val itemColor = if (selected) MaterialTheme.colorScheme.onBackground else Gray500
 
-                    Column(
+                    Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
@@ -63,28 +63,34 @@ fun CalmBottomBar(navController: NavHostController) {
                                     restoreState = true
                                 }
                             },
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
                     ) {
-                        Icon(
-                            imageVector = destination.icon,
-                            contentDescription = stringResource(destination.labelRes),
-                            tint = itemColor,
-                            modifier = Modifier.size(24.dp),
-                        )
-                        Text(
-                            text = stringResource(destination.labelRes),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = itemColor,
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Box(
-                            Modifier
-                                .height(2.dp)
-                                .width(28.dp)
-                                .background(if (selected) MaterialTheme.colorScheme.onBackground else Color.Transparent),
-                        )
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Icon(
+                                imageVector = destination.icon,
+                                contentDescription = stringResource(destination.labelRes),
+                                tint = itemColor,
+                                modifier = Modifier.size(24.dp),
+                            )
+                            Text(
+                                text = stringResource(destination.labelRes),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = itemColor,
+                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        }
+                        // Podtržení vybrané záložky: úplně dole, přes celou šířku dlaždice, 3 dp.
+                        if (selected) {
+                            Box(
+                                Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth()
+                                    .height(3.dp)
+                                    .background(MaterialTheme.colorScheme.onBackground),
+                            )
+                        }
                     }
                 }
             }
