@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="96" viewBox="0 0 320 96" fill="none">
+  <!-- Horizontální logo: značka "Horizont" + nápis Heller. -->
+  <g transform="scale(0.889)">
+    <!-- Slunce / mince -->
+    <circle cx="54" cy="42" r="14" fill="none" stroke="#000000" stroke-width="2.5"/>
+    <!-- Hladina -->
+    <path d="M26 62 L82 62" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Odraz -->
+    <path d="M41 70 L67 70" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+    <path d="M46 78 L62 78" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <text x="108" y="61" font-family="Inter, Helvetica, Arial, sans-serif" font-size="44" font-weight="600" letter-spacing="0.5" fill="#000000">Heller</text>
+</svg>

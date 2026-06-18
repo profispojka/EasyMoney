@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108" fill="none">
+  <!-- Heller "Horizont": slunce/mince nad klidnou hladinou s odrazem. Monochrom, černá na průhledném. -->
+  <!-- Slunce / mince -->
+  <circle cx="54" cy="42" r="14" fill="none" stroke="#000000" stroke-width="2.5"/>
+  <!-- Hladina -->
+  <path d="M26 62 L82 62" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Odraz -->
+  <path d="M41 70 L67 70" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+  <path d="M46 78 L62 78" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+</svg>
