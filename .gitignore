@@ -9,3 +9,8 @@
 .cxx
 local.properties
 /app/build/
+
+# Podpisové údaje (nikdy do gitu)
+keystore.properties
+*.jks
+*.keystore

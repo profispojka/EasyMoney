@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Heller</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_dashboard">Overview</string>
+    <string name="nav_records">Records</string>
+    <string name="nav_planned">Payments</string>
+    <string name="nav_budgets">Budgets</string>
+    <string name="nav_statistics">Statistics</string>
+    <string name="nav_more">More</string>
+    <string name="action_add_record">Add record</string>
+
+    <!-- Common actions -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
+    <string name="action_edit">Edit</string>
+
+    <!-- Account types -->
+    <string name="account_type_cash">Cash</string>
+    <string name="account_type_checking">Checking account</string>
+    <string name="account_type_credit_card">Credit card</string>
+    <string name="account_type_savings">Savings</string>
+    <string name="account_type_investment">Investments</string>
+    <string name="account_type_other">Other</string>
+
+    <!-- More -->
+    <string name="more_accounts">Accounts</string>
+    <string name="more_categories">Categories</string>
+    <string name="more_budgets">Budgets</string>
+    <string name="more_backup">Data backup</string>
+
+    <!-- Accounts -->
+    <string name="accounts_title">Accounts</string>
+    <string name="accounts_add">+ Add account</string>
+    <string name="account_delete_title">Delete account?</string>
+    <string name="account_delete_message">Account “%1$s” will be removed.</string>
+    <string name="account_new_title">New account</string>
+    <string name="account_edit_title">Edit account</string>
+    <string name="account_name">Account name</string>
+    <string name="account_type">Account type</string>
+    <string name="account_initial_balance">Initial balance (%1$s)</string>
+    <string name="account_business">Business account</string>
+    <string name="account_business_hint">Incoming payments are treated as income (regardless of sender).</string>
+    <string name="account_loading">Loading…</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome">Welcome to Heller</string>
+    <string name="onboarding_subtitle">Choose a currency and create your first account. The currency applies to the whole app.</string>
+    <string name="onboarding_currency">Currency</string>
+    <string name="onboarding_start">Start</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_net_worth">Net worth</string>
+    <string name="dashboard_expense_trend">Spending trend</string>
+    <string name="dashboard_income_trend">Income trend</string>
+    <string name="dashboard_upcoming">Upcoming payments</string>
+    <string name="dashboard_overdue">Overdue</string>
+    <string name="dashboard_recent">Recent records</string>
+    <string name="dashboard_no_records">No records yet. Add the first one with +.</string>
+
+    <!-- Chart period -->
+    <string name="trend_30d">30 days</string>
+    <string name="trend_12w">12 weeks</string>
+    <string name="trend_6m">6 months</string>
+    <string name="trend_1y">1 year</string>
+
+    <!-- Shared types/labels -->
+    <string name="type_income">Income</string>
+    <string name="type_expense">Expense</string>
+    <string name="no_category">No category</string>
+    <string name="no_end">No end</string>
+
+    <!-- Frequency -->
+    <string name="freq_daily">Daily</string>
+    <string name="freq_weekly">Weekly</string>
+    <string name="freq_monthly">Monthly</string>
+    <string name="freq_quarterly">Quarterly (4×/year)</string>
+    <string name="freq_three_per_year">3×/year</string>
+    <string name="freq_semiannual">Semi-annually (2×/year)</string>
+    <string name="freq_yearly">Yearly</string>
+    <string name="freq_every_n_days">Every %1$d days</string>
+    <string name="freq_every_n_weeks">Every %1$d weeks</string>
+    <string name="freq_every_n_months">Every %1$d months</string>
+    <string name="freq_every_n_years">Every %1$d years</string>
+    <string name="freq_preset_weekly">Weekly</string>
+    <string name="freq_preset_monthly">Monthly</string>
+    <string name="freq_preset_quarterly">Quarterly</string>
+    <string name="freq_preset_3x_year">3×/year</string>
+    <string name="freq_preset_2x_year">2×/year</string>
+    <string name="freq_preset_yearly">Yearly</string>
+
+    <!-- Planned payments -->
+    <string name="planned_title">Planned payments</string>
+    <string name="planned_next_month">Next month — %1$s</string>
+    <string name="planned_will_pay">You\'ll pay</string>
+    <string name="planned_will_receive">You\'ll receive</string>
+    <string name="planned_empty">No planned payments yet. Add the first one with +.</string>
+    <string name="planned_next_prefix">Next %1$s</string>
+    <string name="planned_ended">Ended</string>
+    <string name="planned_delete_title">Delete planned payment?</string>
+    <string name="planned_detail_title">Planned payment</string>
+    <string name="planned_not_found">Payment not found.</string>
+    <string name="planned_pay_now">Pay now</string>
+    <string name="planned_add_title">New payment</string>
+    <string name="planned_edit_title">Edit payment</string>
+    <string name="planned_name_label">Name (e.g. Rent, Netflix)</string>
+    <string name="planned_start_label">Start (first payment)</string>
+    <string name="planned_end_label">End</string>
+    <string name="planned_clear_end">Clear end</string>
+
+    <!-- Detail rows -->
+    <string name="detail_type">Type</string>
+    <string name="detail_account">Account</string>
+    <string name="detail_category">Category</string>
+    <string name="detail_frequency">Frequency</string>
+    <string name="detail_next">Next</string>
+    <string name="detail_end">End</string>
+    <string name="detail_note">Note</string>
+
+    <!-- Form fields -->
+    <string name="field_amount_currency">Amount (%1$s)</string>
+    <string name="field_note">Note</string>
+    <string name="pick_account">Select account</string>
+
+    <!-- Match payment -->
+    <string name="match_title">Link payment</string>
+    <string name="match_due">Due %1$s</string>
+    <string name="match_hint">Choose the transaction that paid this. The payment then disappears from upcoming.</string>
+    <string name="match_empty">No transactions to link on this account yet.</string>
+    <string name="record_default_payee">Payment</string>
+
+    <!-- Records -->
+    <string name="record_transfer">Transfer</string>
+    <string name="records_income">Income</string>
+    <string name="records_expenses">Expenses</string>
+    <string name="filter_label">Filter</string>
+    <string name="filter_all">All</string>
+    <string name="filter_clear">Clear filter</string>
+    <string name="records_empty_title">No records</string>
+    <string name="records_empty_sub">Income and expenses will appear here.</string>
+    <string name="records_empty_filter_title">Nothing matches the filter</string>
+    <string name="records_empty_filter_sub">Try adjusting or clearing the filter.</string>
+    <string name="day_today">Today</string>
+    <string name="day_yesterday">Yesterday</string>
+
+    <!-- Record detail -->
+    <string name="record_detail_title">Record detail</string>
+    <string name="record_not_found">Record not found.</string>
+    <string name="detail_from_account">From account</string>
+    <string name="detail_to_account">To account</string>
+    <string name="detail_date">Date</string>
+    <string name="detail_payee">Payee</string>
+    <string name="record_delete_title">Delete record?</string>
+    <string name="record_delete_transfer_msg">The transfer will be deleted including both sides.</string>
+    <string name="record_delete_msg">The record will be removed.</string>
+
+    <!-- New/edit record -->
+    <string name="record_add_title">New record</string>
+    <string name="record_edit_title">Edit record</string>
+    <string name="record_all_synced_hint">Your account syncs from Fio — it fills automatically from the bank, so manual records can\'t be added to it (to keep amounts matching your online banking). To add records manually, create another account, e.g. a cash one (More → Accounts).</string>
+    <string name="field_datetime">Date and time</string>
+    <string name="action_next">Next</string>
+    <string name="time_title">Time</string>
+    <string name="siblings_title">Apply to all the same?</string>
+    <string name="siblings_message">You still have %1$d uncategorized payments from “%2$s”. Categorize them as “%3$s” too?</string>
+    <string name="siblings_apply">Apply to all</string>
+    <string name="siblings_skip">Just this one</string>
+    <string name="siblings_this_category">this category</string>
+
+    <!-- Statistics -->
+    <string name="this_month">This month</string>
+    <string name="stats_balance">Balance</string>
+    <string name="stats_cashflow">Cash flow</string>
+    <string name="stats_forecast">Forecast</string>
+    <string name="stats_forecast_sub">expenses next month</string>
+    <string name="month_prev">Previous month</string>
+    <string name="month_next">Next month</string>
+    <string name="stats_no_expenses">No expenses this month.</string>
+    <string name="stats_no_income">No income this month.</string>
+    <string name="stats_category_hint">Tap a category to see its transactions.</string>
+
+    <!-- Categories (UI) -->
+    <string name="category_new">+ New category</string>
+    <string name="category_picker_title">Select category</string>
+    <string name="category_delete_title">Delete category?</string>
+    <string name="category_delete_with_children">“%1$s” and its subcategories will be deleted. Records stay but become “No category”.</string>
+    <string name="category_delete_single">Category “%1$s” will be removed. Its records stay as “No category”.</string>
+    <string name="category_add_title">New category</string>
+    <string name="category_edit_title">Edit category</string>
+    <string name="category_name_label">Category name (e.g. Holiday)</string>
+    <string name="category_parent_label">Parent category (optional)</string>
+    <string name="category_parent_none">None (top level)</string>
+    <string name="category_icon_label">Icon</string>
+    <string name="category_default_name">Category</string>
+
+    <!-- Categories (preset names) -->
+    <string name="cat_food">Food &amp; drinks</string>
+    <string name="cat_food_groceries">Groceries</string>
+    <string name="cat_food_restaurant">Restaurants, fast food</string>
+    <string name="cat_food_bar">Bar, café</string>
+    <string name="cat_shopping">Shopping</string>
+    <string name="cat_shopping_clothes">Clothing &amp; footwear</string>
+    <string name="cat_shopping_jewelry">Jewelry, accessories</string>
+    <string name="cat_shopping_health_beauty">Health, beauty</string>
+    <string name="cat_shopping_kids">Kids</string>
+    <string name="cat_shopping_home_garden">Home, garden</string>
+    <string name="cat_shopping_pets">Pets, animals</string>
+    <string name="cat_shopping_electronics">Electronics, accessories</string>
+    <string name="cat_shopping_gifts">Gifts, treats</string>
+    <string name="cat_shopping_office_tools">Office, tools</string>
+    <string name="cat_shopping_free_time">Free time</string>
+    <string name="cat_shopping_drugstore">Drugstore</string>
+    <string name="cat_housing">Housing</string>
+    <string name="cat_housing_rent">Rent</string>
+    <string name="cat_housing_mortgage">Mortgage</string>
+    <string name="cat_housing_utilities">Utilities</string>
+    <string name="cat_housing_services">Services</string>
+    <string name="cat_housing_maintenance">Maintenance, repairs</string>
+    <string name="cat_housing_property_insurance">Property insurance</string>
+    <string name="cat_transport">Transport</string>
+    <string name="cat_transport_public">Public transport</string>
+    <string name="cat_transport_taxi">Taxi</string>
+    <string name="cat_transport_long_distance">Long-distance travel</string>
+    <string name="cat_transport_business_trips">Business trips</string>
+    <string name="cat_vehicle">Vehicle</string>
+    <string name="cat_vehicle_fuel">Fuel</string>
+    <string name="cat_vehicle_parking">Parking</string>
+    <string name="cat_vehicle_maintenance">Vehicle maintenance</string>
+    <string name="cat_vehicle_rental">Rental</string>
+    <string name="cat_vehicle_vehicle_insurance">Vehicle insurance</string>
+    <string name="cat_vehicle_leasing">Leasing</string>
+    <string name="cat_life">Life, entertainment</string>
+    <string name="cat_life_healthcare">Healthcare, doctor</string>
+    <string name="cat_life_wellness">Wellness, beauty</string>
+    <string name="cat_life_sport">Active sport, fitness</string>
+    <string name="cat_life_culture">Culture, sports events</string>
+    <string name="cat_life_life_events">Life events</string>
+    <string name="cat_life_hobbies">Hobbies</string>
+    <string name="cat_life_education">Education, personal growth</string>
+    <string name="cat_life_books">Books, audio, subscriptions</string>
+    <string name="cat_life_tv">TV, streaming</string>
+    <string name="cat_life_holidays">Holidays, trips, hotels</string>
+    <string name="cat_life_charity">Charity, donations</string>
+    <string name="cat_comm">Communication, PC</string>
+    <string name="cat_comm_phone">Phone, mobile</string>
+    <string name="cat_comm_internet">Internet</string>
+    <string name="cat_comm_software">Software, apps, games</string>
+    <string name="cat_comm_postal">Postal services</string>
+    <string name="cat_financial">Financial expenses</string>
+    <string name="cat_financial_taxes">Taxes</string>
+    <string name="cat_financial_insurance">Insurance</string>
+    <string name="cat_financial_loans">Loans, instalments</string>
+    <string name="cat_financial_fines">Fines</string>
+    <string name="cat_financial_advisory">Advisory</string>
+    <string name="cat_financial_fees">Fees</string>
+    <string name="cat_financial_alimony">Alimony</string>
+    <string name="cat_investments">Investments</string>
+    <string name="cat_investments_realty">Real estate</string>
+    <string name="cat_investments_movables">Vehicles, movable property</string>
+    <string name="cat_investments_financial">Financial investments</string>
+    <string name="cat_investments_savings">Savings</string>
+    <string name="cat_investments_collections">Collections</string>
+    <string name="cat_income">Income</string>
+    <string name="cat_income_wage">Salary, wages, invoicing</string>
+    <string name="cat_income_interest">Interest, dividends</string>
+    <string name="cat_income_sale">Sale</string>
+    <string name="cat_income_rental">Rental income</string>
+    <string name="cat_income_grants">Benefits and grants</string>
+    <string name="cat_income_lending">Income from lending</string>
+    <string name="cat_income_coupons">Cheques, coupons, meal vouchers</string>
+    <string name="cat_income_lottery">Lottery, gambling</string>
+    <string name="cat_income_refunds">Refunds (tax, purchase)</string>
+    <string name="cat_income_alimony">Alimony</string>
+    <string name="cat_income_gifts">Gifts</string>
+    <string name="cat_others">Other</string>
+    <string name="cat_others_missing">Missing</string>
+    <string name="cat_work">Work / Business</string>
+    <string name="cat_cash_withdrawal">Cash withdrawal</string>
+
+    <!-- Budgets -->
+    <string name="analytics_tab">Analytics</string>
+    <string name="budget_new">+ New budget</string>
+    <string name="budgets_empty">No budgets yet. Create the first one and track spending.</string>
+    <string name="budget_delete_title">Delete budget?</string>
+    <string name="budget_delete_message">Budget “%1$s” will be removed.</string>
+    <string name="budget_over">Over by %1$s</string>
+    <string name="budget_remaining">Remaining %1$s</string>
+    <string name="budget_add_title">New budget</string>
+    <string name="budget_name_label">Budget name</string>
+    <string name="budget_limit_label">Limit (%1$s)</string>
+    <string name="budget_period_label">Period</string>
+    <string name="budget_categories_label">Categories (empty = all expenses)</string>
+    <string name="budget_period_week">Week</string>
+    <string name="budget_period_month">Month</string>
+    <string name="budget_period_year">Year</string>
+
+    <!-- Analytics -->
+    <string name="analytics_net">Net</string>
+    <string name="analytics_by_category">Expenses by category</string>
+    <string name="analytics_cashflow">Cash flow (6 months)</string>
+    <string name="analytics_cashflow_legend">Top bar = income, bottom = expenses.</string>
+
+    <!-- Recurring payments -->
+    <string name="recurring_title">Recurring payments</string>
+    <string name="recurring_empty">No recurring payments found. Sync transactions from Fio first.</string>
+    <string name="recurring_hint">These payments repeat every month. Pick which ones to add to planned payments.</string>
+    <string name="recurring_monthly_prefix">monthly · %1$s</string>
+    <string name="recurring_add_selected">Add selected (%1$d)</string>
+    <string name="recurring_note_from_fio">From Fio (estimated from history)</string>
+
+    <!-- Fio connection -->
+    <string name="fio_section_title">Fio connection</string>
+    <string name="fio_connect_hint">Enter a read-only Fio token and this account will fill automatically with bank transactions. Create the token in Fio internet banking: Settings → API → Add new token → “Account monitoring only”. It is read-only — you can\'t send a payment with it.</string>
+    <string name="fio_token_label">Fio token</string>
+    <string name="fio_syncing">Syncing…</string>
+    <string name="fio_connect_sync">Connect and sync</string>
+    <string name="fio_connected">Connected to Fio. Syncs automatically every day in the background. Last: %1$s.</string>
+    <string name="fio_never">never yet</string>
+    <string name="fio_find_recurring">Find recurring payments (standing orders)</string>
+    <string name="fio_disconnect">Disconnect from Fio</string>
+    <string name="fio_downloading">Downloading transactions from Fio…</string>
+    <string name="fio_disconnect_title">Disconnect from Fio?</string>
+    <string name="fio_disconnect_message">This account will stop syncing from Fio automatically. Imported records stay. To reconnect, enter the token again.</string>
+    <string name="fio_disconnect_confirm">Disconnect</string>
+    <string name="fio_recurring_title">Recurring payments</string>
+    <string name="fio_recurring_message">I found %1$d payments that repeat every month (standing orders / subscriptions). Add them to planned payments?</string>
+    <string name="fio_recurring_manual">Rather select manually</string>
+    <string name="fio_recurring_yes">Yes, add</string>
+    <string name="action_no">No</string>
+    <string name="fio_error_missing_token">Fio token is missing.</string>
+    <string name="fio_error_invalid_token">Invalid token (HTTP 404). Check that it was copied correctly.</string>
+    <string name="fio_error_422">For data older than 90 days, unlock the token in Fio internet banking: Settings → API → lock icon next to the token → confirm (SMS/app). Then sync again within 10 minutes.</string>
+    <string name="fio_error_http">Fio rejected the request (HTTP %1$d).</string>
+    <string name="fio_error_network">Network error: %1$s</string>
+    <string name="fio_error_parse">Could not read data from Fio.</string>
+    <string name="fio_sync_success">Done: added %1$d new of %2$d transactions, categorized %3$d.</string>
+    <string name="fio_rate_limited">Fio allows only 1 request per 30 s. Try again in a moment.</string>
+    <string name="fio_added_planned">Added %1$d planned payments.</string>
+
+    <!-- Backup -->
+    <string name="backup_error_open_target">Could not open backup target.</string>
+    <string name="backup_error_open_backup">Could not open backup.</string>
+    <string name="backup_error_invalid">The file is not a valid Heller backup.</string>
+    <string name="backup_in_progress">Backing up…</string>
+    <string name="backup_done">Backup saved.</string>
+    <string name="backup_failed">Backup failed: %1$s</string>
+    <string name="restore_in_progress">Restoring…</string>
+    <string name="restore_failed">Restore failed: %1$s</string>
+    <string name="backup_intro">The app is offline — data lives only on your phone. Back it up to a file (to Files, a drive, etc.). Restore reads the file back and overwrites current data.</string>
+    <string name="backup_action">Back up data</string>
+    <string name="restore_action">Restore from backup</string>
+    <string name="restore_confirm_title">Restore from backup?</string>
+    <string name="restore_confirm_message">This overwrites all current data and the app restarts.</string>
+    <string name="restore_confirm_yes">Restore</string>
+
+    <!-- Default names -->
+    <string name="account_default_name">Account</string>
+    <string name="budget_default_name">Budget</string>
+</resources>

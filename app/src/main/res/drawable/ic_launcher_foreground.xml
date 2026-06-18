@@ -3,7 +3,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- CalmMoney "Horizont": slunce/mince nad klidnou hladinou s odrazem. -->
+    <!-- Heller "Horizont": slunce/mince nad klidnou hladinou s odrazem. -->
     <!-- Slunce / mince -->
     <path
         android:pathData="M40,42 a14,14 0 1,1 28,0 a14,14 0 1,1 -28,0"

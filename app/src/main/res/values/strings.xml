@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CalmMoney</string>
+    <string name="app_name">Heller</string>
 
     <!-- Spodní navigace -->
     <string name="nav_dashboard">Přehled</string>
@@ -11,21 +11,353 @@
     <string name="nav_more">Více</string>
     <string name="action_add_record">Přidat záznam</string>
 
-    <!-- Obrazovky (placeholdery Fáze 0) -->
-    <string name="dashboard_title">Přehled</string>
-    <string name="records_title">Záznamy</string>
-    <string name="budgets_title">Rozpočty</string>
-    <string name="more_title">Více</string>
-    <string name="add_record_title">Nový záznam</string>
-
-    <!-- Prázdné stavy -->
-    <string name="empty_dashboard_title">Zatím prázdno</string>
-    <string name="empty_dashboard_subtitle">Přidej první záznam tlačítkem +.</string>
-    <string name="empty_records_title">Žádné záznamy</string>
-    <string name="empty_records_subtitle">Příjmy a výdaje se objeví tady.</string>
-    <string name="empty_budgets_title">Žádné rozpočty</string>
-    <string name="empty_budgets_subtitle">Vytvoř rozpočet a sleduj čerpání.</string>
-
+    <!-- Společné akce -->
+    <string name="action_save">Uložit</string>
+    <string name="action_cancel">Zrušit</string>
+    <string name="action_delete">Smazat</string>
+    <string name="action_back">Zpět</string>
     <string name="action_close">Zavřít</string>
-    <string name="placeholder_screen">Obrazovka se připravuje (Fáze 0 – kostra).</string>
+    <string name="action_edit">Upravit</string>
+
+    <!-- Typy účtů -->
+    <string name="account_type_cash">Hotovost</string>
+    <string name="account_type_checking">Běžný účet</string>
+    <string name="account_type_credit_card">Kreditní karta</string>
+    <string name="account_type_savings">Spoření</string>
+    <string name="account_type_investment">Investice</string>
+    <string name="account_type_other">Jiné</string>
+
+    <!-- Více -->
+    <string name="more_accounts">Účty</string>
+    <string name="more_categories">Kategorie</string>
+    <string name="more_budgets">Rozpočty</string>
+    <string name="more_backup">Záloha dat</string>
+
+    <!-- Účty -->
+    <string name="accounts_title">Účty</string>
+    <string name="accounts_add">+ Přidat účet</string>
+    <string name="account_delete_title">Smazat účet?</string>
+    <string name="account_delete_message">Účet „%1$s“ bude odstraněn.</string>
+    <string name="account_new_title">Nový účet</string>
+    <string name="account_edit_title">Upravit účet</string>
+    <string name="account_name">Název účtu</string>
+    <string name="account_type">Typ účtu</string>
+    <string name="account_initial_balance">Počáteční zůstatek (%1$s)</string>
+    <string name="account_business">Podnikatelský účet</string>
+    <string name="account_business_hint">Příchozí platby se berou jako příjem (neřeší se od koho).</string>
+    <string name="account_loading">Načítám…</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome">Vítej v Heller</string>
+    <string name="onboarding_subtitle">Vyber měnu a vytvoř první účet. Měna platí pro celou aplikaci.</string>
+    <string name="onboarding_currency">Měna</string>
+    <string name="onboarding_start">Začít</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_net_worth">Čisté jmění</string>
+    <string name="dashboard_expense_trend">Vývoj výdajů</string>
+    <string name="dashboard_income_trend">Vývoj příjmů</string>
+    <string name="dashboard_upcoming">Nadcházející platby</string>
+    <string name="dashboard_overdue">Po splatnosti</string>
+    <string name="dashboard_recent">Poslední záznamy</string>
+    <string name="dashboard_no_records">Zatím žádné záznamy. Přidej první tlačítkem +.</string>
+
+    <!-- Období grafu -->
+    <string name="trend_30d">30 dní</string>
+    <string name="trend_12w">12 týdnů</string>
+    <string name="trend_6m">6 měsíců</string>
+    <string name="trend_1y">1 rok</string>
+
+    <!-- Sdílené typy/štítky -->
+    <string name="type_income">Příjem</string>
+    <string name="type_expense">Výdaj</string>
+    <string name="no_category">Bez kategorie</string>
+    <string name="no_end">Bez konce</string>
+
+    <!-- Frekvence -->
+    <string name="freq_daily">Denně</string>
+    <string name="freq_weekly">Týdně</string>
+    <string name="freq_monthly">Měsíčně</string>
+    <string name="freq_quarterly">Čtvrtletně (4× ročně)</string>
+    <string name="freq_three_per_year">3× ročně</string>
+    <string name="freq_semiannual">Pololetně (2× ročně)</string>
+    <string name="freq_yearly">Ročně</string>
+    <string name="freq_every_n_days">Každých %1$d dní</string>
+    <string name="freq_every_n_weeks">Každých %1$d týdnů</string>
+    <string name="freq_every_n_months">Každých %1$d měsíců</string>
+    <string name="freq_every_n_years">Každých %1$d let</string>
+    <string name="freq_preset_weekly">Týdně</string>
+    <string name="freq_preset_monthly">Měsíčně</string>
+    <string name="freq_preset_quarterly">Čtvrtletně</string>
+    <string name="freq_preset_3x_year">3× ročně</string>
+    <string name="freq_preset_2x_year">2× ročně</string>
+    <string name="freq_preset_yearly">Ročně</string>
+
+    <!-- Plánované platby -->
+    <string name="planned_title">Plánované platby</string>
+    <string name="planned_next_month">Příští měsíc — %1$s</string>
+    <string name="planned_will_pay">Zaplatíš</string>
+    <string name="planned_will_receive">Přijmeš</string>
+    <string name="planned_empty">Zatím žádné plánované platby. Přidej první tlačítkem +.</string>
+    <string name="planned_next_prefix">Příště %1$s</string>
+    <string name="planned_ended">Ukončeno</string>
+    <string name="planned_delete_title">Smazat plánovanou platbu?</string>
+    <string name="planned_detail_title">Plánovaná platba</string>
+    <string name="planned_not_found">Platba nenalezena.</string>
+    <string name="planned_pay_now">Zaplatit teď</string>
+    <string name="planned_add_title">Nová platba</string>
+    <string name="planned_edit_title">Upravit platbu</string>
+    <string name="planned_name_label">Název (např. Nájem, Netflix)</string>
+    <string name="planned_start_label">Začátek (první platba)</string>
+    <string name="planned_end_label">Konec</string>
+    <string name="planned_clear_end">Zrušit konec</string>
+
+    <!-- Detail řádky -->
+    <string name="detail_type">Typ</string>
+    <string name="detail_account">Účet</string>
+    <string name="detail_category">Kategorie</string>
+    <string name="detail_frequency">Frekvence</string>
+    <string name="detail_next">Příště</string>
+    <string name="detail_end">Konec</string>
+    <string name="detail_note">Poznámka</string>
+
+    <!-- Formulářová pole -->
+    <string name="field_amount_currency">Částka (%1$s)</string>
+    <string name="field_note">Poznámka</string>
+    <string name="pick_account">Vyber účet</string>
+
+    <!-- Napojení platby -->
+    <string name="match_title">Napojit platbu</string>
+    <string name="match_due">Splatnost %1$s</string>
+    <string name="match_hint">Vyber transakci, která tuhle platbu zaplatila. Platba pak zmizí z nadcházejících.</string>
+    <string name="match_empty">Na tomhle účtu zatím nejsou žádné transakce k napojení.</string>
+    <string name="record_default_payee">Platba</string>
+
+    <!-- Záznamy -->
+    <string name="record_transfer">Převod</string>
+    <string name="records_income">Příjmy</string>
+    <string name="records_expenses">Výdaje</string>
+    <string name="filter_label">Filtr</string>
+    <string name="filter_all">Vše</string>
+    <string name="filter_clear">Vyčistit filtr</string>
+    <string name="records_empty_title">Žádné záznamy</string>
+    <string name="records_empty_sub">Příjmy a výdaje se objeví tady.</string>
+    <string name="records_empty_filter_title">Nic neodpovídá filtru</string>
+    <string name="records_empty_filter_sub">Zkus upravit nebo vyčistit filtr.</string>
+    <string name="day_today">Dnes</string>
+    <string name="day_yesterday">Včera</string>
+
+    <!-- Detail záznamu -->
+    <string name="record_detail_title">Detail záznamu</string>
+    <string name="record_not_found">Záznam nenalezen.</string>
+    <string name="detail_from_account">Z účtu</string>
+    <string name="detail_to_account">Na účet</string>
+    <string name="detail_date">Datum</string>
+    <string name="detail_payee">Příjemce</string>
+    <string name="record_delete_title">Smazat záznam?</string>
+    <string name="record_delete_transfer_msg">Smaže se převod včetně obou stran.</string>
+    <string name="record_delete_msg">Záznam bude odstraněn.</string>
+
+    <!-- Nový/upravit záznam -->
+    <string name="record_add_title">Nový záznam</string>
+    <string name="record_edit_title">Upravit záznam</string>
+    <string name="record_all_synced_hint">Tvůj účet se synchronizuje z Fia — plní se automaticky z banky, takže ruční záznamy do něj nejdou (aby částky seděly s internetbankingem). Pro ruční zadávání si vytvoř další účet, např. hotovostní (Více → Účty).</string>
+    <string name="field_datetime">Datum a čas</string>
+    <string name="action_next">Dál</string>
+    <string name="time_title">Čas</string>
+    <string name="siblings_title">Použít na všechny stejné?</string>
+    <string name="siblings_message">Máš ještě %1$d nezařazených plateb od „%2$s“. Zařadit je taky jako „%3$s“?</string>
+    <string name="siblings_apply">Použít na všechny</string>
+    <string name="siblings_skip">Jen tuhle</string>
+    <string name="siblings_this_category">tuhle kategorii</string>
+
+    <!-- Statistiky -->
+    <string name="this_month">Tento měsíc</string>
+    <string name="stats_balance">Zůstatek</string>
+    <string name="stats_cashflow">Cash flow</string>
+    <string name="stats_forecast">Výhled</string>
+    <string name="stats_forecast_sub">výdaje příští měsíc</string>
+    <string name="month_prev">Předchozí měsíc</string>
+    <string name="month_next">Další měsíc</string>
+    <string name="stats_no_expenses">Tento měsíc žádné výdaje.</string>
+    <string name="stats_no_income">Tento měsíc žádné příjmy.</string>
+    <string name="stats_category_hint">Klepni na kategorii pro její transakce.</string>
+
+    <!-- Kategorie (UI) -->
+    <string name="category_new">+ Nová kategorie</string>
+    <string name="category_picker_title">Výběr kategorie</string>
+    <string name="category_delete_title">Smazat kategorii?</string>
+    <string name="category_delete_with_children">Smaže se „%1$s“ i její podkategorie. Záznamy zůstanou, ale budou „Bez kategorie“.</string>
+    <string name="category_delete_single">Kategorie „%1$s“ bude odstraněna. Záznamy s ní zůstanou jako „Bez kategorie“.</string>
+    <string name="category_add_title">Nová kategorie</string>
+    <string name="category_edit_title">Upravit kategorii</string>
+    <string name="category_name_label">Název kategorie (např. Dovolená)</string>
+    <string name="category_parent_label">Nadřazená kategorie (volitelné)</string>
+    <string name="category_parent_none">Žádná (hlavní)</string>
+    <string name="category_icon_label">Ikona</string>
+    <string name="category_default_name">Kategorie</string>
+
+    <!-- Kategorie (přednastavené názvy) -->
+    <string name="cat_food">Jídlo a pití</string>
+    <string name="cat_food_groceries">Potraviny</string>
+    <string name="cat_food_restaurant">Restaurace, fast-food</string>
+    <string name="cat_food_bar">Bar, kavárna</string>
+    <string name="cat_shopping">Nákupy</string>
+    <string name="cat_shopping_clothes">Oděvy a obuv</string>
+    <string name="cat_shopping_jewelry">Klenoty, módní doplňky</string>
+    <string name="cat_shopping_health_beauty">Zdraví, krása</string>
+    <string name="cat_shopping_kids">Děti</string>
+    <string name="cat_shopping_home_garden">Domácnost, zahrada</string>
+    <string name="cat_shopping_pets">Mazlíčci, zvířata</string>
+    <string name="cat_shopping_electronics">Elektronika, příslušenství</string>
+    <string name="cat_shopping_gifts">Dárky, radosti</string>
+    <string name="cat_shopping_office_tools">Kancelář, nářadí</string>
+    <string name="cat_shopping_free_time">Volný čas</string>
+    <string name="cat_shopping_drugstore">Drogerie</string>
+    <string name="cat_housing">Bydlení</string>
+    <string name="cat_housing_rent">Nájemné</string>
+    <string name="cat_housing_mortgage">Hypotéka</string>
+    <string name="cat_housing_utilities">Energie, komunál</string>
+    <string name="cat_housing_services">Služby</string>
+    <string name="cat_housing_maintenance">Údržba, opravy</string>
+    <string name="cat_housing_property_insurance">Pojištění majetku</string>
+    <string name="cat_transport">Doprava</string>
+    <string name="cat_transport_public">Veřejná doprava</string>
+    <string name="cat_transport_taxi">Taxi</string>
+    <string name="cat_transport_long_distance">Dálková doprava</string>
+    <string name="cat_transport_business_trips">Služební cesty</string>
+    <string name="cat_vehicle">Vozidlo</string>
+    <string name="cat_vehicle_fuel">Palivo</string>
+    <string name="cat_vehicle_parking">Parkování</string>
+    <string name="cat_vehicle_maintenance">Údržba vozidel</string>
+    <string name="cat_vehicle_rental">Půjčování</string>
+    <string name="cat_vehicle_vehicle_insurance">Pojištění vozidla</string>
+    <string name="cat_vehicle_leasing">Leasing</string>
+    <string name="cat_life">Život, zábava</string>
+    <string name="cat_life_healthcare">Zdravotní péče, lékař</string>
+    <string name="cat_life_wellness">Wellness, krása</string>
+    <string name="cat_life_sport">Aktivní sport, fitness</string>
+    <string name="cat_life_culture">Kultura, sportovní akce</string>
+    <string name="cat_life_life_events">Životní události</string>
+    <string name="cat_life_hobbies">Koníčky</string>
+    <string name="cat_life_education">Vzdělávání, osobní rozvoj</string>
+    <string name="cat_life_books">Knihy, audio, předplatné</string>
+    <string name="cat_life_tv">Televize, streaming</string>
+    <string name="cat_life_holidays">Dovolená, výlety, hotely</string>
+    <string name="cat_life_charity">Charita, dary</string>
+    <string name="cat_comm">Komunikace, PC</string>
+    <string name="cat_comm_phone">Telefon, mobil</string>
+    <string name="cat_comm_internet">Internet</string>
+    <string name="cat_comm_software">Software, aplikace, hry</string>
+    <string name="cat_comm_postal">Poštovní služby</string>
+    <string name="cat_financial">Finanční výdaje</string>
+    <string name="cat_financial_taxes">Daně</string>
+    <string name="cat_financial_insurance">Pojištění</string>
+    <string name="cat_financial_loans">Půjčky, splátky</string>
+    <string name="cat_financial_fines">Pokuty</string>
+    <string name="cat_financial_advisory">Poradenství</string>
+    <string name="cat_financial_fees">Poplatky</string>
+    <string name="cat_financial_alimony">Alimenty</string>
+    <string name="cat_investments">Investice</string>
+    <string name="cat_investments_realty">Nemovitosti</string>
+    <string name="cat_investments_movables">Vozidla, movitý majetek</string>
+    <string name="cat_investments_financial">Finanční investice</string>
+    <string name="cat_investments_savings">Spoření</string>
+    <string name="cat_investments_collections">Sbírky</string>
+    <string name="cat_income">Příjem</string>
+    <string name="cat_income_wage">Plat, mzda, fakturace</string>
+    <string name="cat_income_interest">Úroky, dividendy</string>
+    <string name="cat_income_sale">Prodej</string>
+    <string name="cat_income_rental">Příjem z pronájmu</string>
+    <string name="cat_income_grants">Příspěvky a granty</string>
+    <string name="cat_income_lending">Příjem ze zapůjčení</string>
+    <string name="cat_income_coupons">Šeky, kupóny, stravenky</string>
+    <string name="cat_income_lottery">Loterie, hazard</string>
+    <string name="cat_income_refunds">Refundace (daň, nákup)</string>
+    <string name="cat_income_alimony">Alimenty</string>
+    <string name="cat_income_gifts">Dárky</string>
+    <string name="cat_others">Ostatní</string>
+    <string name="cat_others_missing">Chybějící</string>
+    <string name="cat_work">Práce / Podnikání</string>
+    <string name="cat_cash_withdrawal">Výběr hotovosti</string>
+
+    <!-- Rozpočty -->
+    <string name="analytics_tab">Analýzy</string>
+    <string name="budget_new">+ Nový rozpočet</string>
+    <string name="budgets_empty">Zatím žádné rozpočty. Vytvoř první a sleduj čerpání.</string>
+    <string name="budget_delete_title">Smazat rozpočet?</string>
+    <string name="budget_delete_message">Rozpočet „%1$s“ bude odstraněn.</string>
+    <string name="budget_over">Přečerpáno o %1$s</string>
+    <string name="budget_remaining">Zbývá %1$s</string>
+    <string name="budget_add_title">Nový rozpočet</string>
+    <string name="budget_name_label">Název rozpočtu</string>
+    <string name="budget_limit_label">Limit (%1$s)</string>
+    <string name="budget_period_label">Období</string>
+    <string name="budget_categories_label">Kategorie (prázdné = všechny výdaje)</string>
+    <string name="budget_period_week">Týden</string>
+    <string name="budget_period_month">Měsíc</string>
+    <string name="budget_period_year">Rok</string>
+
+    <!-- Analýzy -->
+    <string name="analytics_net">Saldo</string>
+    <string name="analytics_by_category">Výdaje podle kategorií</string>
+    <string name="analytics_cashflow">Cash flow (6 měsíců)</string>
+    <string name="analytics_cashflow_legend">Horní pruh = příjmy, dolní = výdaje.</string>
+
+    <!-- Opakované platby -->
+    <string name="recurring_title">Opakované platby</string>
+    <string name="recurring_empty">Nenašel jsem žádné pravidelné platby. Stáhni nejdřív pohyby z Fia.</string>
+    <string name="recurring_hint">Tyhle platby se opakují každý měsíc. Vyber, které chceš přidat mezi plánované.</string>
+    <string name="recurring_monthly_prefix">měsíčně · %1$s</string>
+    <string name="recurring_add_selected">Přidat vybrané (%1$d)</string>
+    <string name="recurring_note_from_fio">Z Fio (odhad z historie)</string>
+
+    <!-- Napojení na Fio -->
+    <string name="fio_section_title">Napojení na Fio</string>
+    <string name="fio_connect_hint">Zadej read-only Fio token a tenhle účet se bude automaticky plnit pohyby z banky. Token vytvoříš ve Fio internetbankingu: Nastavení → API → Přidat nový token → „Pouhé monitorování účtu“. Je jen pro čtení — platbu přes něj poslat nelze.</string>
+    <string name="fio_token_label">Fio token</string>
+    <string name="fio_syncing">Synchronizuji…</string>
+    <string name="fio_connect_sync">Napojit a synchronizovat</string>
+    <string name="fio_connected">Připojeno k Fio. Synchronizuje se automaticky každý den na pozadí. Poslední: %1$s.</string>
+    <string name="fio_never">zatím nikdy</string>
+    <string name="fio_find_recurring">Najít opakované platby (trvalé příkazy)</string>
+    <string name="fio_disconnect">Odpojit od Fio</string>
+    <string name="fio_downloading">Stahuji pohyby z Fia…</string>
+    <string name="fio_disconnect_title">Odpojit od Fio?</string>
+    <string name="fio_disconnect_message">Tenhle účet se přestane z Fia automaticky stahovat. Naimportované záznamy zůstanou. Pro opětovné připojení zadáš token znovu.</string>
+    <string name="fio_disconnect_confirm">Odpojit</string>
+    <string name="fio_recurring_title">Pravidelné platby</string>
+    <string name="fio_recurring_message">Našel jsem %1$d plateb, co se opakují každý měsíc (trvalé příkazy / předplatné). Přidat je mezi plánované platby?</string>
+    <string name="fio_recurring_manual">Raději vybrat ručně</string>
+    <string name="fio_recurring_yes">Ano, přidat</string>
+    <string name="action_no">Ne</string>
+    <string name="fio_error_missing_token">Chybí Fio token.</string>
+    <string name="fio_error_invalid_token">Neplatný token (HTTP 404). Zkontroluj, že je správně zkopírovaný.</string>
+    <string name="fio_error_422">Pro data starší 90 dní odemkni token ve Fio internetbankingu: Nastavení → API → ikona zámku u tokenu → potvrď (SMS/aplikace). Pak do 10 minut stáhni znovu.</string>
+    <string name="fio_error_http">Fio odmítlo dotaz (HTTP %1$d).</string>
+    <string name="fio_error_network">Síťová chyba: %1$s</string>
+    <string name="fio_error_parse">Nepodařilo se přečíst data z Fia.</string>
+    <string name="fio_sync_success">Hotovo: přidáno %1$d nových z %2$d pohybů, zařazeno %3$d.</string>
+    <string name="fio_rate_limited">Fio dovolí jen 1 dotaz za 30 s. Zkus to za chvíli.</string>
+    <string name="fio_added_planned">Přidáno %1$d plánovaných plateb.</string>
+
+    <!-- Záloha -->
+    <string name="backup_error_open_target">Nelze otevřít cíl zálohy.</string>
+    <string name="backup_error_open_backup">Nelze otevřít zálohu.</string>
+    <string name="backup_error_invalid">Soubor není platná záloha Heller.</string>
+    <string name="backup_in_progress">Zálohuji…</string>
+    <string name="backup_done">Záloha uložena.</string>
+    <string name="backup_failed">Záloha selhala: %1$s</string>
+    <string name="restore_in_progress">Obnovuji…</string>
+    <string name="restore_failed">Obnova selhala: %1$s</string>
+    <string name="backup_intro">Appka je offline — data jsou jen v telefonu. Zálohou si je ulož do souboru (do Souborů, na disk apod.). Obnova soubor načte zpět a přepíše současná data.</string>
+    <string name="backup_action">Zálohovat data</string>
+    <string name="restore_action">Obnovit ze zálohy</string>
+    <string name="restore_confirm_title">Obnovit ze zálohy?</string>
+    <string name="restore_confirm_message">Přepíše to všechna současná data a aplikace se restartuje.</string>
+    <string name="restore_confirm_yes">Obnovit</string>
+
+    <!-- Výchozí názvy -->
+    <string name="account_default_name">Účet</string>
+    <string name="budget_default_name">Rozpočet</string>
 </resources>

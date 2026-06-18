@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,12 +8,20 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
+// Podpisové údaje pro release jsou mimo git (keystore.properties + .jks).
+// Když soubor chybí (cizí klon / CI), release se podepíše debug klíčem, ať build nespadne.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) keystorePropertiesFile.inputStream().use { load(it) }
+}
+val hasReleaseKeystore = keystorePropertiesFile.exists()
+
 android {
-    namespace = "cz.calmmoney"
+    namespace = "cz.heller"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "cz.calmmoney"
+        applicationId = "cz.heller"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -20,9 +30,23 @@ android {
         vectorDrawables { useSupportLibrary = true }
     }
 
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = if (hasReleaseKeystore) signingConfigs.getByName("release")
+                else signingConfigs.getByName("debug")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
