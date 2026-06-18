@@ -123,8 +123,8 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   Room databáze. DI přes Hilt (`di/DatabaseModule`).
 - **Nastavení** (`data/settings`): `SettingsRepository` na DataStore (onboarding).
 - **Peníze** (`core/money/Money`): formátování CZK z minor units, znaménko, `BigDecimal`.
-- **Launcher ikona**: adaptivní, monochrom (značka mince + vlnka), `+` monochrome vrstva.
-- **Logo**: `assets/logo/` — `calmmoney-mark.svg`, `…-mark-inverted.svg`, `…-lockup.svg`.
+- **Launcher ikona**: adaptivní, monochrom (značka „Horizont" — slunce/mince nad hladinou), `+` monochrome vrstva.
+- **Logo**: `assets/logo/` — `heller-mark.svg`, `heller-mark-inverted.svg`, `heller-lockup.svg`.
 
 ## ⚠️ Tady to nešlo sestavit
 V tomto prostředí **chybí JDK a Android SDK**, takže projekt **nebyl zkompilován ani spuštěn**.
