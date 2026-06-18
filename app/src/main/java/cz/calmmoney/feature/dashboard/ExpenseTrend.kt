@@ -32,10 +32,15 @@ object ExpenseTrend {
     private val zone: ZoneId = ZoneId.systemDefault()
     private val dayFmt = DateTimeFormatter.ofPattern("d.M.", Locale.forLanguageTag("cs-CZ"))
 
-    fun compute(period: TrendPeriod, records: List<RecordEntity>, today: LocalDate = LocalDate.now()): TrendResult {
-        val buckets = buckets(period, records, today)
+    fun compute(
+        period: TrendPeriod,
+        records: List<RecordEntity>,
+        today: LocalDate = LocalDate.now(),
+        type: RecordType = RecordType.EXPENSE,
+    ): TrendResult {
+        val buckets = buckets(period, records, today, type)
         val total = buckets.sumOf { it.second }
-        val prev = previousTotal(period, records, today)
+        val prev = previousTotal(period, records, today, type)
         val pct = if (prev > 0) (((total - prev) * 100) / prev).toInt() else null
         return TrendResult(
             points = buckets.map { it.second },
@@ -45,53 +50,53 @@ object ExpenseTrend {
         )
     }
 
-    /** Páry (popisek, součet výdajů) v daném období, od nejstaršího po nejnovější. */
-    private fun buckets(period: TrendPeriod, records: List<RecordEntity>, today: LocalDate): List<Pair<String, Long>> =
+    /** Páry (popisek, součet) v daném období, od nejstaršího po nejnovější. */
+    private fun buckets(period: TrendPeriod, records: List<RecordEntity>, today: LocalDate, type: RecordType): List<Pair<String, Long>> =
         when (period) {
-            TrendPeriod.MONTHS_6 -> monthBuckets(records, today, 6)
-            TrendPeriod.YEAR -> monthBuckets(records, today, 12)
-            TrendPeriod.WEEKS_12 -> spanBuckets(records, today, count = 12, unitDays = 7)
-            TrendPeriod.DAYS_30 -> spanBuckets(records, today, count = 30, unitDays = 1)
+            TrendPeriod.MONTHS_6 -> monthBuckets(records, today, 6, type)
+            TrendPeriod.YEAR -> monthBuckets(records, today, 12, type)
+            TrendPeriod.WEEKS_12 -> spanBuckets(records, today, count = 12, unitDays = 7, type = type)
+            TrendPeriod.DAYS_30 -> spanBuckets(records, today, count = 30, unitDays = 1, type = type)
         }
 
-    private fun monthBuckets(records: List<RecordEntity>, today: LocalDate, n: Int): List<Pair<String, Long>> =
+    private fun monthBuckets(records: List<RecordEntity>, today: LocalDate, n: Int, type: RecordType): List<Pair<String, Long>> =
         Periods.lastMonths(n, today).map { ym ->
             val (s, e) = Periods.monthWindow(ym)
-            Periods.monthShort(ym) to sumExpense(records, s, e)
+            Periods.monthShort(ym) to sumType(records, s, e, type)
         }
 
-    private fun spanBuckets(records: List<RecordEntity>, today: LocalDate, count: Int, unitDays: Int): List<Pair<String, Long>> =
+    private fun spanBuckets(records: List<RecordEntity>, today: LocalDate, count: Int, unitDays: Int, type: RecordType): List<Pair<String, Long>> =
         (0 until count).map { i ->
             val endDate = today.minusDays((count - 1 - i).toLong() * unitDays)
             val startDate = endDate.minusDays((unitDays - 1).toLong())
-            dayFmt.format(startDate) to daysSum(records, startDate, endDate)
+            dayFmt.format(startDate) to daysSum(records, startDate, endDate, type)
         }
 
-    /** Součet výdajů v předchozím stejně dlouhém období (pro % změnu). */
-    private fun previousTotal(period: TrendPeriod, records: List<RecordEntity>, today: LocalDate): Long =
+    /** Součet v předchozím stejně dlouhém období (pro % změnu). */
+    private fun previousTotal(period: TrendPeriod, records: List<RecordEntity>, today: LocalDate, type: RecordType): Long =
         when (period) {
-            TrendPeriod.MONTHS_6 -> monthsAgoSum(records, today, fromAgo = 12, count = 6)
-            TrendPeriod.YEAR -> monthsAgoSum(records, today, fromAgo = 24, count = 12)
-            TrendPeriod.WEEKS_12 -> daysSum(records, today.minusDays(167), today.minusDays(84))
-            TrendPeriod.DAYS_30 -> daysSum(records, today.minusDays(59), today.minusDays(30))
+            TrendPeriod.MONTHS_6 -> monthsAgoSum(records, today, fromAgo = 12, count = 6, type = type)
+            TrendPeriod.YEAR -> monthsAgoSum(records, today, fromAgo = 24, count = 12, type = type)
+            TrendPeriod.WEEKS_12 -> daysSum(records, today.minusDays(167), today.minusDays(84), type)
+            TrendPeriod.DAYS_30 -> daysSum(records, today.minusDays(59), today.minusDays(30), type)
         }
 
-    private fun monthsAgoSum(records: List<RecordEntity>, today: LocalDate, fromAgo: Int, count: Int): Long {
+    private fun monthsAgoSum(records: List<RecordEntity>, today: LocalDate, fromAgo: Int, count: Int, type: RecordType): Long {
         val cur = YearMonth.from(today)
         var sum = 0L
         for (k in (fromAgo - 1) downTo (fromAgo - count)) {
             val (s, e) = Periods.monthWindow(cur.minusMonths(k.toLong()))
-            sum += sumExpense(records, s, e)
+            sum += sumType(records, s, e, type)
         }
         return sum
     }
 
-    private fun daysSum(records: List<RecordEntity>, startDate: LocalDate, endDateInclusive: LocalDate): Long =
-        sumExpense(records, startMillis(startDate), startMillis(endDateInclusive.plusDays(1)))
+    private fun daysSum(records: List<RecordEntity>, startDate: LocalDate, endDateInclusive: LocalDate, type: RecordType): Long =
+        sumType(records, startMillis(startDate), startMillis(endDateInclusive.plusDays(1)), type)
 
-    private fun sumExpense(records: List<RecordEntity>, sMillis: Long, eMillis: Long): Long =
+    private fun sumType(records: List<RecordEntity>, sMillis: Long, eMillis: Long, type: RecordType): Long =
         records.asSequence()
-            .filter { it.type == RecordType.EXPENSE && it.dateTime in sMillis until eMillis }
+            .filter { it.type == type && it.dateTime in sMillis until eMillis }
             .sumOf { it.amountMinor }
 
     private fun startMillis(d: LocalDate): Long = d.atStartOfDay(zone).toInstant().toEpochMilli()

@@ -81,13 +81,13 @@ fun CalmBottomBar(navController: NavHostController) {
                                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                             )
                         }
-                        // Podtržení vybrané záložky: úplně dole, přes celou šířku dlaždice, 3 dp.
+                        // Podtržení vybrané záložky: úplně dole, přes celou šířku dlaždice, 4 dp.
                         if (selected) {
                             Box(
                                 Modifier
                                     .align(Alignment.BottomCenter)
                                     .fillMaxWidth()
-                                    .height(3.dp)
+                                    .height(4.dp)
                                     .background(MaterialTheme.colorScheme.onBackground),
                             )
                         }

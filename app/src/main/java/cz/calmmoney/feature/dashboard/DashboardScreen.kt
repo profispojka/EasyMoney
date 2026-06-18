@@ -40,6 +40,7 @@ import cz.calmmoney.data.repo.CategorizationRepository
 import cz.calmmoney.data.repo.CategoryRepository
 import cz.calmmoney.data.repo.PlannedPaymentRepository
 import cz.calmmoney.data.repo.RecordRepository
+import cz.calmmoney.data.settings.SettingsRepository
 import cz.calmmoney.feature.accounts.AccountRow
 import java.time.LocalDate
 import cz.calmmoney.feature.records.RecordRowItem
@@ -79,6 +80,12 @@ data class DashboardUiState(
     val trendLabels: List<String> = emptyList(),
     val trendTotalMinor: Long = 0,
     val trendChangePct: Int? = null,
+    // Vývoj příjmů — jen když je napojený podnikatelský účet.
+    val showIncomeTrend: Boolean = false,
+    val incomeTrendPoints: List<Long> = emptyList(),
+    val incomeTrendLabels: List<String> = emptyList(),
+    val incomeTrendTotalMinor: Long = 0,
+    val incomeTrendChangePct: Int? = null,
 )
 
 @HiltViewModel
@@ -87,6 +94,7 @@ class DashboardViewModel @Inject constructor(
     records: RecordRepository,
     categories: CategoryRepository,
     planned: PlannedPaymentRepository,
+    settings: SettingsRepository,
     private val categorization: CategorizationRepository,
 ) : ViewModel() {
 
@@ -122,10 +130,22 @@ class DashboardViewModel @Inject constructor(
     }
 
     private val trend = combine(records.observeAll(), periodFlow) { allRecs, period ->
-        period to ExpenseTrend.compute(period, allRecs)
+        Triple(
+            period,
+            ExpenseTrend.compute(period, allRecs, type = RecordType.EXPENSE),
+            ExpenseTrend.compute(period, allRecs, type = RecordType.INCOME),
+        )
     }
 
-    val state: StateFlow<DashboardUiState> = combine(base, planned.observeAll(), trend) { dash, payments, td ->
+    /** Je napojený (Fio) účet typu podnikatelský? → ukaž graf vývoje příjmů. */
+    private val hasBusinessAccount = combine(accounts.observeActive(), settings.fioConnections) { accs, conns ->
+        val connectedIds = conns.map { it.accountId }.toSet()
+        accs.any { it.isBusiness && it.id in connectedIds }
+    }
+
+    val state: StateFlow<DashboardUiState> = combine(
+        base, planned.observeAll(), trend, hasBusinessAccount,
+    ) { dash, payments, td, hasBiz ->
         val today = LocalDate.now()
         val upcoming = payments
             .mapNotNull { p ->
@@ -143,14 +163,19 @@ class DashboardViewModel @Inject constructor(
                     overdue = date.isBefore(today),
                 )
             }
-        val (period, result) = td
+        val (period, expense, income) = td
         dash.copy(
             upcoming = upcoming,
             period = period,
-            trendPoints = result.points,
-            trendLabels = result.axisLabels,
-            trendTotalMinor = result.totalMinor,
-            trendChangePct = result.changePct,
+            trendPoints = expense.points,
+            trendLabels = expense.axisLabels,
+            trendTotalMinor = expense.totalMinor,
+            trendChangePct = expense.changePct,
+            showIncomeTrend = hasBiz,
+            incomeTrendPoints = income.points,
+            incomeTrendLabels = income.axisLabels,
+            incomeTrendTotalMinor = income.totalMinor,
+            incomeTrendChangePct = income.changePct,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardUiState())
 }
@@ -182,49 +207,32 @@ fun DashboardScreen(
             }
 
             if (state.trendPoints.any { it > 0 }) {
-                Column {
-                    SectionHeader("Vývoj výdajů")
-                    CalmCard(Modifier.fillMaxWidth()) {
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Column(Modifier.weight(1f)) {
-                                Text(
-                                    state.period.label,
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                MoneyAmount(
-                                    amountMinor = -state.trendTotalMinor,
-                                    withSign = false,
-                                    style = MaterialTheme.typography.headlineSmall,
-                                )
-                            }
-                            state.trendChangePct?.let { pct ->
-                                Text(
-                                    formatChangePct(pct),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                        TrendChart(
-                            points = state.trendPoints,
-                            labels = state.trendLabels,
-                            modifier = Modifier.padding(vertical = 12.dp),
-                        )
-                        Row(
-                            Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            TrendPeriod.entries.forEach { p ->
-                                CalmChip(
-                                    label = p.label,
-                                    selected = state.period == p,
-                                    onClick = { vm.setPeriod(p) },
-                                )
-                            }
-                        }
-                    }
-                }
+                TrendCard(
+                    title = "Vývoj výdajů",
+                    periodLabel = state.period.label,
+                    displayAmountMinor = -state.trendTotalMinor,
+                    displayWithSign = false,
+                    changePct = state.trendChangePct,
+                    points = state.trendPoints,
+                    labels = state.trendLabels,
+                    period = state.period,
+                    onPeriod = vm::setPeriod,
+                )
+            }
+
+            // Vývoj příjmů — jen u napojeného podnikatelského účtu.
+            if (state.showIncomeTrend && state.incomeTrendPoints.any { it > 0 }) {
+                TrendCard(
+                    title = "Vývoj příjmů",
+                    periodLabel = state.period.label,
+                    displayAmountMinor = state.incomeTrendTotalMinor,
+                    displayWithSign = true,
+                    changePct = state.incomeTrendChangePct,
+                    points = state.incomeTrendPoints,
+                    labels = state.incomeTrendLabels,
+                    period = state.period,
+                    onPeriod = vm::setPeriod,
+                )
             }
 
             Column {
@@ -314,5 +322,63 @@ private fun OverdueBadge(dateText: String) {
                 .padding(horizontal = 6.dp, vertical = 1.dp),
         )
         Text(dateText, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+/** Karta vývoje (výdajů/příjmů): součet za období, % změna, spojnicový graf a přepínač období. */
+@Composable
+private fun TrendCard(
+    title: String,
+    periodLabel: String,
+    displayAmountMinor: Long,
+    displayWithSign: Boolean,
+    changePct: Int?,
+    points: List<Long>,
+    labels: List<String>,
+    period: TrendPeriod,
+    onPeriod: (TrendPeriod) -> Unit,
+) {
+    Column {
+        SectionHeader(title)
+        CalmCard(Modifier.fillMaxWidth()) {
+            Row(verticalAlignment = Alignment.Bottom) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        periodLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    MoneyAmount(
+                        amountMinor = displayAmountMinor,
+                        withSign = displayWithSign,
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                }
+                changePct?.let { pct ->
+                    Text(
+                        formatChangePct(pct),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            TrendChart(
+                points = points,
+                labels = labels,
+                modifier = Modifier.padding(vertical = 12.dp),
+            )
+            Row(
+                Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                TrendPeriod.entries.forEach { p ->
+                    CalmChip(
+                        label = p.label,
+                        selected = period == p,
+                        onClick = { onPeriod(p) },
+                    )
+                }
+            }
+        }
     }
 }

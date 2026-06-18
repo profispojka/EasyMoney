@@ -62,16 +62,16 @@ fun CalmConfirmSheet(
                         containerColor = MaterialTheme.colorScheme.onBackground,
                         contentColor = MaterialTheme.colorScheme.background,
                     ),
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
                 ) {
-                    Text(confirmLabel, style = MaterialTheme.typography.titleMedium)
+                    Text(confirmLabel, style = MaterialTheme.typography.titleLarge)
                 }
                 OutlinedButton(
                     onClick = onDismiss,
                     shape = buttonShape,
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    modifier = Modifier.fillMaxWidth().height(60.dp),
                 ) {
-                    Text("Zrušit", style = MaterialTheme.typography.titleMedium)
+                    Text("Zrušit", style = MaterialTheme.typography.titleLarge)
                 }
             }
         }

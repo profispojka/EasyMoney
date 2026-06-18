@@ -93,7 +93,9 @@ Cílové zařízení: **Mudita Kompakt**. Build OK; ověřeno během na emuláto
   výběr účtu, mřížka kategorií (s ikonami), poznámka, uložení do DB.
 - **Dashboard** — čisté jmění, **graf „Vývoj výdajů"** (monochrom spojnice + šedá výplň,
   `TrendChart`), přepínač období (30 dní / 12 týdnů / 6 měsíců / 1 rok) a **% změna** vs předchozí
-  stejně dlouhé období (`ExpenseTrend`), přehled účtů, nadcházející platby, poslední záznamy — živě z DB.
+  stejně dlouhé období (`ExpenseTrend`, sdílená `TrendCard`). **Graf „Vývoj příjmů"** se ukáže navíc,
+  jen když je **napojený podnikatelský účet** (Fio + `isBusiness`). Přehled účtů, nadcházející platby,
+  poslední záznamy — živě z DB.
 - **Záznamy** — seskupení po dnech s denními součty + souhrn příjmů/výdajů.
 - **Kategorie** — seed dle Wallet (viz [kategorie-seed.md](kategorie-seed.md)): **11 skupin /
   69 podkategorií / 80 celkem**, z toho skupina **Příjem** = příjmová (INCOME), zbytek výdajové.
