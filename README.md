@@ -1,47 +1,45 @@
-# CalmMoney — osobní finanční tracker
+# CalmMoney — personal finance tracker
 
-Android aplikace pro sledování příjmů a výdajů, inspirovaná funkcemi
+Android app for tracking income and expenses, inspired by the features of
 **Wallet by BudgetBakers** ([budgetbakers.com](https://budgetbakers.com/en/products/wallet/)),
-rozšířená o **konektor na Fio banku** (automatický import transakcí).
+extended with a **Fio bank connector** for automatic transaction import.
 
-## Rozhodnutá technologie (potvrzeno)
+## Chosen technology (confirmed)
 
-| Oblast | Volba |
+| Area | Choice |
 |---|---|
-| Název / package | **CalmMoney** · `cz.calmmoney` |
-| Platforma | **Android, nativně** |
-| Jazyk / UI | **Kotlin + Jetpack Compose (Material 3, přebarvené na monochrom)** |
-| Vzhled | **Černobílý E-Ink** — monochrom, vysoký kontrast, bez animací ([docs/08](docs/08-design-eink.md)) |
-| Cílové zařízení | **Mudita Kompakt** (E-Ink Android) — potvrzeno |
-| Data | **Offline-first** (vše lokálně v telefonu), cloud sync až v pozdější fázi |
-| Banka | **Fio banka — pouze import transakcí** (read-only token, žádné odchozí platby) |
+| Name / package | **CalmMoney** · `cz.calmmoney` |
+| Platform | **Android, native** |
+| Language / UI | **Kotlin + Jetpack Compose (Material 3, recolored to monochrome)** |
+| Visual style | **Black-and-white E-Ink** — monochrome, high contrast, no animations ([docs/08](docs/08-design-eink.md)) |
+| Target device | **Mudita Kompakt** (E-Ink Android) — confirmed |
+| Data | **Offline-first** (all data stored locally on the phone), cloud sync planned later |
+| Bank | **Fio banka — import only** (read-only token, no outgoing payments) |
 
-## Stav: založen projekt (Fáze 0)
+## Status: project initialized (Phase 0)
 
-V `docs/` je kompletní plán, v kořeni je **Android projekt** (`cz.calmmoney`) — kostra
-appky, monochromatický E-Ink design system a navigace. Logo v `assets/logo/`.
+`docs/` contains the full project plan. The repository root includes an **Android project** (`cz.calmmoney`) — app skeleton, monochrome E-Ink design system, and navigation. Logo assets are in `assets/logo/`.
 
-> ⚠️ Projekt zatím **nebyl zkompilován** (prostředí nemá JDK ani Android SDK).
-> Otevři kořen `Money/` v **Android Studiu** (doplní SDK) nebo sestav přes
-> `./gradlew :app:assembleDebug` (vyžaduje JDK 17 + Android SDK).
-> Detail a další kroky v [docs/09-stav-projektu.md](docs/09-stav-projektu.md).
+> ⚠️ The project has not been built yet (the current environment does not include JDK or Android SDK).
+> Open the `Money/` root in **Android Studio** (it will install the SDK) or build with
+> `./gradlew :app:assembleDebug` (requires JDK 17 + Android SDK).
+> Details and next steps are in [docs/09-stav-projektu.md](docs/09-stav-projektu.md).
 
-## Mapa dokumentů
+## Document map
 
-| Soubor | Obsah |
+| File | Contents |
 |---|---|
-| [docs/00-prehled-a-rozsah.md](docs/00-prehled-a-rozsah.md) | Vize, rozsah, co je a není v MVP |
-| [docs/01-funkce.md](docs/01-funkce.md) | Kompletní seznam funkcí Wallet + jak je pokryjeme |
-| [docs/02-obrazovky.md](docs/02-obrazovky.md) | **Detailní popis každé obrazovky** a co se na ní děje |
-| [docs/03-datovy-model.md](docs/03-datovy-model.md) | Datový model (Room entity, vztahy, peníze, měny) |
-| [docs/04-fio-konektor.md](docs/04-fio-konektor.md) | Fio API, token, sync, mapování polí, bezpečnost |
-| [docs/05-architektura.md](docs/05-architektura.md) | Tech stack, vrstvy, knihovny, struktura projektu |
-| [docs/06-roadmap.md](docs/06-roadmap.md) | Fáze vývoje a milníky |
-| [docs/07-otevrene-otazky.md](docs/07-otevrene-otazky.md) | Otázky a rozhodnutí k odsouhlasení |
-| [docs/08-design-eink.md](docs/08-design-eink.md) | **Vizuální styl: černobílý E-Ink** (tokeny, typografie, grafy, interakce) |
-| [docs/09-stav-projektu.md](docs/09-stav-projektu.md) | **Stav kódu** — co je v Fázi 0 hotové a jak projekt sestavit |
+| [docs/00-prehled-a-rozsah.md](docs/00-prehled-a-rozsah.md) | Vision, scope, what is and is not in the MVP |
+| [docs/01-funkce.md](docs/01-funkce.md) | Complete feature list from Wallet + how we will cover it |
+| [docs/02-obrazovky.md](docs/02-obrazovky.md) | **Detailed description of every screen** and its behavior |
+| [docs/03-datovy-model.md](docs/03-datovy-model.md) | Data model (Room entities, relationships, money, currencies) |
+| [docs/04-fio-konektor.md](docs/04-fio-konektor.md) | Fio API, token, sync, field mapping, security |
+| [docs/05-architektura.md](docs/05-architektura.md) | Tech stack, layers, libraries, project structure |
+| [docs/06-roadmap.md](docs/06-roadmap.md) | Development phases and milestones |
+| [docs/07-otevrene-otazky.md](docs/07-otevrene-otazky.md) | Open questions and decisions to approve |
+| [docs/08-design-eink.md](docs/08-design-eink.md) | **Visual style: black-and-white E-Ink** (tokens, typography, charts, interactions) |
+| [docs/09-stav-projektu.md](docs/09-stav-projektu.md) | **Code status** — what is done in Phase 0 and how to build the project |
 
-## Další krok
+## Next step
 
-Otevřít projekt v Android Studiu a ověřit build, pak **Fáze 1** (přednastavené kategorie,
-onboarding, formulář transakce, napojení dashboardu na DB) dle [docs/06-roadmap.md](docs/06-roadmap.md).
+Open the project in Android Studio and verify the build, then move to **Phase 1** (preset categories, onboarding, transaction form, dashboard wired to the DB) according to [docs/06-roadmap.md](docs/06-roadmap.md).
