@@ -57,6 +57,8 @@
     <string name="dashboard_net_worth">Čisté jmění</string>
     <string name="dashboard_expense_trend">Vývoj výdajů</string>
     <string name="dashboard_income_trend">Vývoj příjmů</string>
+    <string name="dashboard_balance_trend">Vývoj zůstatku</string>
+    <string name="dashboard_top_expenses">Nejvyšší výdaje tento měsíc</string>
     <string name="dashboard_upcoming">Nadcházející platby</string>
     <string name="dashboard_overdue">Po splatnosti</string>
     <string name="dashboard_recent">Poslední záznamy</string>

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +46,8 @@ import cz.heller.data.repo.RecordRepository
 import cz.heller.data.settings.SettingsRepository
 import cz.heller.feature.accounts.AccountRow
 import java.time.LocalDate
+import java.time.YearMonth
+import cz.heller.core.time.Periods
 import cz.heller.feature.records.RecordRowItem
 import cz.heller.feature.records.RecordRowUi
 import cz.heller.feature.records.toRowUi
@@ -84,12 +87,19 @@ data class DashboardUiState(
     val trendLabels: List<String> = emptyList(),
     val trendTotalMinor: Long = 0,
     val trendChangePct: Int? = null,
+    // Balance (net) trend across all accounts
+    val balanceTrendPoints: List<Long> = emptyList(),
+    val balanceTrendLabels: List<String> = emptyList(),
+    val balanceTrendTotalMinor: Long = 0,
+    val balanceTrendChangePct: Int? = null,
     // Vývoj příjmů — jen když je napojený podnikatelský účet.
     val showIncomeTrend: Boolean = false,
     val incomeTrendPoints: List<Long> = emptyList(),
     val incomeTrendLabels: List<String> = emptyList(),
     val incomeTrendTotalMinor: Long = 0,
     val incomeTrendChangePct: Int? = null,
+    // Top expenses this month: pairs (categoryName, amountMinor)
+    val topExpenses: List<Pair<String, Long>> = emptyList(),
 )
 
 @HiltViewModel
@@ -148,7 +158,8 @@ class DashboardViewModel @Inject constructor(
         accs.any { it.isBusiness && it.id in connectedIds }
     }
 
-    val state: StateFlow<DashboardUiState> = combine(
+    // First combine: base state + planned + trend + business flag
+    val intermediate: StateFlow<DashboardUiState> = combine(
         base, planned.observeAll(), trend, hasBusinessAccount,
     ) { dash, payments, td, hasBiz ->
         val today = LocalDate.now()
@@ -169,6 +180,7 @@ class DashboardViewModel @Inject constructor(
                 )
             }
         val (period, expense, income) = td
+
         dash.copy(
             upcoming = upcoming,
             period = period,
@@ -181,6 +193,48 @@ class DashboardViewModel @Inject constructor(
             incomeTrendLabels = income.axisLabels,
             incomeTrendTotalMinor = income.totalMinor,
             incomeTrendChangePct = income.changePct,
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardUiState())
+
+    // Enrich intermediate state with balance trend and top expenses using full records and categories
+    val state: StateFlow<DashboardUiState> = combine(
+        intermediate, records.observeAll(), categories.observeAll(),
+    ) { dash, recordsAll, cats ->
+        val today = LocalDate.now()
+
+        // Compute balance trend from dash.trendPoints (expense) and dash.incomeTrendPoints
+        val expPoints = dash.trendPoints
+        val incPoints = dash.incomeTrendPoints
+        val bucketsCount = maxOf(expPoints.size, incPoints.size)
+        val netPerBucket = (0 until bucketsCount).map { i -> (incPoints.getOrNull(i) ?: 0L) - (expPoints.getOrNull(i) ?: 0L) }
+        val suffixSums = LongArray(bucketsCount)
+        var acc = 0L
+        for (i in bucketsCount - 1 downTo 0) {
+            suffixSums[i] = acc
+            acc += netPerBucket[i]
+        }
+        val balancePoints = (0 until bucketsCount).map { i -> dash.netWorthMinor - suffixSums[i] }
+        val balanceLabels = dash.trendLabels
+        val balanceTotal = dash.netWorthMinor
+
+        // Top 3 expense categories for current month
+        val (mStart, mEnd) = Periods.monthWindow(YearMonth.from(today))
+        val catMap = cats.associateBy { it.id }
+        val top = recordsAll.asSequence()
+            .filter { it.type == RecordType.EXPENSE && it.dateTime in mStart until mEnd }
+            .groupBy { it.categoryId }
+            .mapValues { entry -> entry.value.sumOf { it.amountMinor } }
+            .entries
+            .sortedByDescending { it.value }
+            .take(3)
+            .map { kv -> (catMap[kv.key]?.name ?: context.getString(R.string.no_category)) to kv.value }
+
+        dash.copy(
+            balanceTrendPoints = balancePoints,
+            balanceTrendLabels = balanceLabels,
+            balanceTrendTotalMinor = balanceTotal,
+            balanceTrendChangePct = null,
+            topExpenses = top,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardUiState())
 }
@@ -202,59 +256,78 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            CalmCard(Modifier.fillMaxWidth()) {
-                SectionHeader(stringResource(R.string.dashboard_net_worth))
-                MoneyAmount(
-                    amountMinor = state.netWorthMinor,
-                    withSign = false,
-                    style = MaterialTheme.typography.displayLarge,
-                )
+            // Account tiles (2 columns) showing account balances
+            SectionHeader(stringResource(R.string.accounts_title))
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                state.accounts.chunked(2).forEach { pair ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        pair.forEach { row ->
+                            CalmCard(Modifier.weight(1f)) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(AccountTypeUi.icon(row.account.type), contentDescription = null, modifier = Modifier.size(24.dp))
+                                    Text(row.account.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).padding(start = 8.dp))
+                                    MoneyAmount(row.balanceMinor, withSign = false, style = MaterialTheme.typography.bodyLarge)
+                                }
+                            }
+                        }
+                        if (pair.size == 1) Spacer(Modifier.weight(1f))
+                    }
+                }
             }
 
-            if (state.trendPoints.any { it > 0 }) {
+            // Balance trend (combined across all accounts)
+            if (state.balanceTrendPoints.any { it > 0 }) {
                 TrendCard(
-                    title = stringResource(R.string.dashboard_expense_trend),
+                    title = stringResource(R.string.dashboard_balance_trend),
                     periodLabel = stringResource(state.period.labelRes),
-                    displayAmountMinor = -state.trendTotalMinor,
-                    displayWithSign = false,
-                    changePct = state.trendChangePct,
-                    points = state.trendPoints,
-                    labels = state.trendLabels,
-                    period = state.period,
-                    onPeriod = vm::setPeriod,
-                )
-            }
-
-            // Vývoj příjmů — jen u napojeného podnikatelského účtu.
-            if (state.showIncomeTrend && state.incomeTrendPoints.any { it > 0 }) {
-                TrendCard(
-                    title = stringResource(R.string.dashboard_income_trend),
-                    periodLabel = stringResource(state.period.labelRes),
-                    displayAmountMinor = state.incomeTrendTotalMinor,
+                    displayAmountMinor = state.balanceTrendTotalMinor,
                     displayWithSign = true,
-                    changePct = state.incomeTrendChangePct,
-                    points = state.incomeTrendPoints,
-                    labels = state.incomeTrendLabels,
+                    changePct = state.balanceTrendChangePct,
+                    points = state.balanceTrendPoints,
+                    labels = state.balanceTrendLabels,
                     period = state.period,
                     onPeriod = vm::setPeriod,
                 )
+            } else {
+                // Fallback: show expense trend
+                if (state.trendPoints.any { it > 0 }) {
+                    TrendCard(
+                        title = stringResource(R.string.dashboard_expense_trend),
+                        periodLabel = stringResource(state.period.labelRes),
+                        displayAmountMinor = -state.trendTotalMinor,
+                        displayWithSign = false,
+                        changePct = state.trendChangePct,
+                        points = state.trendPoints,
+                        labels = state.trendLabels,
+                        period = state.period,
+                        onPeriod = vm::setPeriod,
+                    )
+                }
             }
 
+            // Top 3 expenses this month
             Column {
-                SectionHeader(stringResource(R.string.accounts_title))
+                SectionHeader(stringResource(R.string.dashboard_top_expenses))
                 CalmCard(Modifier.fillMaxWidth()) {
-                    state.accounts.forEachIndexed { index, row ->
-                        if (index > 0) HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            Icon(AccountTypeUi.icon(row.account.type), contentDescription = null, modifier = Modifier.size(24.dp))
-                            Text(row.account.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-                            MoneyAmount(row.balanceMinor, withSign = false, style = MaterialTheme.typography.bodyLarge)
+                    if (state.topExpenses.isEmpty()) {
+                        Text(stringResource(R.string.stats_no_expenses), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        state.topExpenses.forEachIndexed { index, (name, amount) ->
+                            if (index > 0) HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+                                MoneyAmount(amount, withSign = false, style = MaterialTheme.typography.bodyLarge)
+                            }
                         }
                     }
                 }
