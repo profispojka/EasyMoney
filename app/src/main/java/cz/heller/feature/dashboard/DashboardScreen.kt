@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cz.heller.R
@@ -270,7 +271,13 @@ fun DashboardScreen(
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Icon(AccountTypeUi.icon(row.account.type), contentDescription = null, modifier = Modifier.size(24.dp))
-                                    Text(row.account.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f).padding(start = 8.dp))
+                                    Text(
+                                        row.account.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f).padding(start = 8.dp),
+                                    )
                                     MoneyAmount(row.balanceMinor, withSign = false, style = MaterialTheme.typography.bodyLarge)
                                 }
                             }

@@ -45,6 +45,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.heller.R
 import cz.heller.core.designsystem.component.CalmChip
+import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import cz.heller.core.designsystem.component.CalmPrimaryButton
 import cz.heller.core.money.Money
 import cz.heller.data.db.AccountEntity
@@ -367,7 +368,7 @@ fun AddRecordScreen(
                     showTime = true
                 }) { Text(stringResource(R.string.action_next)) }
             },
-            dismissButton = { TextButton(onClick = { showDate = false }) { Text(stringResource(R.string.action_cancel)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { showDate = false }) { Text(stringResource(R.string.action_cancel)) } },
         ) { DatePicker(state = dpState) }
     }
 
@@ -385,7 +386,7 @@ fun AddRecordScreen(
                     showTime = false
                 }) { Text("OK") }
             },
-            dismissButton = { TextButton(onClick = { showTime = false }) { Text(stringResource(R.string.action_cancel)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { showTime = false }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 
@@ -398,7 +399,7 @@ fun AddRecordScreen(
                 Text(stringResource(R.string.siblings_message, p.count, p.payee, catName))
             },
             confirmButton = { TextButton(onClick = { vm.applySiblings(onClose) }) { Text(stringResource(R.string.siblings_apply)) } },
-            dismissButton = { TextButton(onClick = { vm.skipSiblings(onClose) }) { Text(stringResource(R.string.siblings_skip)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { vm.skipSiblings(onClose) }) { Text(stringResource(R.string.siblings_skip)) } },
         )
     }
 }
@@ -452,6 +453,6 @@ private fun AccountPickerDialog(
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } },
+        dismissButton = { CalmDialogDismissButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } },
     )
 }

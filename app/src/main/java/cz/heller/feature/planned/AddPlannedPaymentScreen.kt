@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -290,7 +291,7 @@ private fun PlannedPaymentForm(
                 }
             },
             confirmButton = {},
-            dismissButton = { TextButton(onClick = { showAccount = false }) { Text(stringResource(R.string.action_close)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { showAccount = false }) { Text(stringResource(R.string.action_close)) } },
         )
     }
     if (showStart) {
@@ -323,6 +324,6 @@ private fun DatePickerSheet(initialEpochDay: Long, onPick: (Long) -> Unit, onDis
                 onPick(day)
             }) { Text("OK") }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
+        dismissButton = { CalmDialogDismissButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     ) { DatePicker(state = dpState) }
 }

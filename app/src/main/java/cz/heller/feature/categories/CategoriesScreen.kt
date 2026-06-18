@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -152,7 +153,7 @@ fun CategoriesScreen(
                 )
             },
             confirmButton = { TextButton(onClick = { vm.delete(c); toDelete = null }) { Text(stringResource(R.string.action_delete)) } },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.action_cancel)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { toDelete = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 }

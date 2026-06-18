@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -185,8 +186,16 @@ fun RecordDetailScreen(
             onDismissRequest = { confirmDelete = false },
             title = { Text(stringResource(R.string.record_delete_title)) },
             text = { Text(stringResource(if (state.isTransfer) R.string.record_delete_transfer_msg else R.string.record_delete_msg)) },
-            confirmButton = { TextButton(onClick = { confirmDelete = false; vm.delete(onBack) }) { Text(stringResource(R.string.action_delete)) } },
-            dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) } },
+            confirmButton = {
+                TextButton(onClick = { confirmDelete = false; vm.delete(onBack) }) {
+                    Text(stringResource(R.string.action_delete))
+                }
+            },
+            dismissButton = {
+                CalmDialogDismissButton(onClick = { confirmDelete = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
         )
     }
 }

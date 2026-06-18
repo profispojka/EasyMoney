@@ -12,15 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import cz.heller.core.designsystem.component.CalmConfirmSheet
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -120,14 +119,11 @@ fun BackupScreen(onBack: () -> Unit, vm: BackupViewModel = hiltViewModel()) {
 
     val uri = confirmRestore
     if (uri != null) {
-        AlertDialog(
-            onDismissRequest = { confirmRestore = null },
-            title = { Text(stringResource(R.string.restore_confirm_title)) },
-            text = { Text(stringResource(R.string.restore_confirm_message)) },
-            confirmButton = {
-                TextButton(onClick = { confirmRestore = null; vm.restore(uri) }) { Text(stringResource(R.string.restore_confirm_yes)) }
-            },
-            dismissButton = { TextButton(onClick = { confirmRestore = null }) { Text(stringResource(R.string.action_cancel)) } },
+        CalmConfirmSheet(
+            title = stringResource(R.string.restore_confirm_title),
+            confirmLabel = stringResource(R.string.restore_confirm_yes),
+            onConfirm = { confirmRestore = null; vm.restore(uri) },
+            onDismiss = { confirmRestore = null },
         )
     }
 }

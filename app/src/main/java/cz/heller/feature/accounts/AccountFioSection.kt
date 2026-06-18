@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -225,7 +226,7 @@ fun AccountFioSection(
             confirmButton = {
                 TextButton(onClick = { confirmDisconnect = false; vm.disconnect() }) { Text(stringResource(R.string.fio_disconnect_confirm)) }
             },
-            dismissButton = { TextButton(onClick = { confirmDisconnect = false }) { Text(stringResource(R.string.action_back)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { confirmDisconnect = false }) { Text(stringResource(R.string.action_back)) } },
         )
     }
 

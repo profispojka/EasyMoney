@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -150,7 +151,7 @@ fun BudgetsScreen(
             title = { Text(stringResource(R.string.budget_delete_title)) },
             text = { Text(stringResource(R.string.budget_delete_message, b.name)) },
             confirmButton = { TextButton(onClick = { vm.delete(b); toDelete = null }) { Text(stringResource(R.string.action_delete)) } },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.action_cancel)) } },
+            dismissButton = { CalmDialogDismissButton(onClick = { toDelete = null }) { Text(stringResource(R.string.action_cancel)) } },
         )
     }
 }

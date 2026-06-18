@@ -49,9 +49,10 @@
 
     <!-- Onboarding -->
     <string name="onboarding_welcome">Welcome to Heller</string>
-    <string name="onboarding_subtitle">Choose a currency and create your first account. The currency applies to the whole app.</string>
+    <string name="onboarding_subtitle">Choose a currency and create your first account, or restore data from a backup.</string>
     <string name="onboarding_currency">Currency</string>
     <string name="onboarding_start">Start</string>
+    <string name="onboarding_restore_hint">Have a backup? Restore it now and skip creating a new account.</string>
 
     <!-- Dashboard -->
     <string name="dashboard_net_worth">Net worth</string>
