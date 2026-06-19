@@ -45,6 +45,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cz.heller.R
 import cz.heller.core.designsystem.component.CalmChip
+import cz.heller.core.designsystem.component.CalmConfirmSheet
 import cz.heller.core.designsystem.component.CalmDialogDismissButton
 import cz.heller.core.designsystem.component.CalmPrimaryButton
 import cz.heller.core.money.Money
@@ -288,7 +289,7 @@ fun AddRecordScreen(
             )
             IconButton(onClick = onClose) { Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.action_close)) }
         }
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onBackground)
 
         Column(
             Modifier.verticalScroll(rememberScrollState()).padding(16.dp),
@@ -392,14 +393,13 @@ fun AddRecordScreen(
 
     pending?.let { p ->
         val catName = state.categories.firstOrNull { it.id == p.categoryId }?.name ?: stringResource(R.string.siblings_this_category)
-        AlertDialog(
-            onDismissRequest = { vm.skipSiblings(onClose) },
-            title = { Text(stringResource(R.string.siblings_title)) },
-            text = {
-                Text(stringResource(R.string.siblings_message, p.count, p.payee, catName))
-            },
-            confirmButton = { TextButton(onClick = { vm.applySiblings(onClose) }) { Text(stringResource(R.string.siblings_apply)) } },
-            dismissButton = { CalmDialogDismissButton(onClick = { vm.skipSiblings(onClose) }) { Text(stringResource(R.string.siblings_skip)) } },
+        CalmConfirmSheet(
+            title = stringResource(R.string.siblings_title),
+            message = stringResource(R.string.siblings_message, p.count, p.payee, catName),
+            confirmLabel = stringResource(R.string.siblings_apply),
+            dismissLabel = stringResource(R.string.siblings_skip),
+            onConfirm = { vm.applySiblings(onClose) },
+            onDismiss = { vm.skipSiblings(onClose) },
         )
     }
 }

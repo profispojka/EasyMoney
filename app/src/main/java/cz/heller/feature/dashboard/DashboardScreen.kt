@@ -264,20 +264,22 @@ fun DashboardScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         pair.forEach { row ->
                             CalmCard(Modifier.weight(1f)) {
-                                Row(
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
+                                    verticalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
-                                    Icon(AccountTypeUi.icon(row.account.type), contentDescription = null, modifier = Modifier.size(24.dp))
-                                    Text(
-                                        row.account.name,
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.weight(1f).padding(start = 8.dp),
-                                    )
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(AccountTypeUi.icon(row.account.type), contentDescription = null, modifier = Modifier.size(20.dp))
+                                        Text(
+                                            row.account.name,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier.weight(1f).padding(start = 8.dp),
+                                        )
+                                    }
                                     MoneyAmount(row.balanceMinor, withSign = false, style = MaterialTheme.typography.bodyLarge)
                                 }
                             }

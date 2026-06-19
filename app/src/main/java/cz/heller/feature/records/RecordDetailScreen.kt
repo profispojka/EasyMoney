@@ -135,7 +135,7 @@ fun RecordDetailScreen(
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back)) }
             Text(stringResource(R.string.record_detail_title), style = MaterialTheme.typography.titleLarge)
         }
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        HorizontalDivider(thickness = 3.dp, color = MaterialTheme.colorScheme.onBackground)
 
         if (record == null) {
             Text(stringResource(R.string.record_not_found), style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(16.dp))

@@ -58,6 +58,7 @@
     <string name="dashboard_net_worth">Net worth</string>
     <string name="dashboard_expense_trend">Spending trend</string>
     <string name="dashboard_income_trend">Income trend</string>
+    <string name="dashboard_balance_trend">Balance trend</string>
     <string name="dashboard_upcoming">Upcoming payments</string>
     <string name="dashboard_overdue">Overdue</string>
     <string name="dashboard_recent">Recent records</string>

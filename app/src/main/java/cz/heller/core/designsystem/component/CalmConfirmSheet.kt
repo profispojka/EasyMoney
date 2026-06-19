@@ -34,6 +34,8 @@ fun CalmConfirmSheet(
     confirmLabel: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    message: String? = null,
+    dismissLabel: String? = null,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -55,8 +57,16 @@ fun CalmConfirmSheet(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = if (message == null) 8.dp else 0.dp),
                 )
+                if (message != null) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                    )
+                }
                 Button(
                     onClick = onConfirm,
                     shape = buttonShape,
@@ -73,7 +83,10 @@ fun CalmConfirmSheet(
                     shape = buttonShape,
                     modifier = Modifier.fillMaxWidth().height(60.dp),
                 ) {
-                    Text(stringResource(R.string.action_cancel), style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        dismissLabel ?: stringResource(R.string.action_cancel),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
                 }
             }
         }
