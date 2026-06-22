@@ -14,7 +14,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import cz.heller.R
 
 /**
  * Číselná klávesnice pro zadání částky (plní se zprava jako na POS).
@@ -52,7 +54,10 @@ fun NumericKeypad(
                             .padding(0.dp),
                     ) {
                         if (key == "⌫") {
-                            Icon(Icons.AutoMirrored.Filled.Backspace, contentDescription = "Smazat")
+                            Icon(
+                                Icons.AutoMirrored.Filled.Backspace,
+                                contentDescription = stringResource(R.string.action_delete),
+                            )
                         } else {
                             Text(key, style = MaterialTheme.typography.titleMedium)
                         }

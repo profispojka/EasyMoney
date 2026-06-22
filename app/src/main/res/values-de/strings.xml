@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Heller</string>
+
+    <!-- Untere Navigation -->
+    <string name="nav_dashboard">Übersicht</string>
+    <string name="nav_records">Einträge</string>
+    <string name="nav_planned">Zahlungen</string>
+    <string name="nav_budgets">Budgets</string>
+    <string name="nav_statistics">Statistik</string>
+    <string name="nav_more">Mehr</string>
+    <string name="action_add_record">Eintrag hinzufügen</string>
+
+    <!-- Allgemeine Aktionen -->
+    <string name="action_save">Speichern</string>
+    <string name="action_cancel">Abbrechen</string>
+    <string name="action_delete">Löschen</string>
+    <string name="action_back">Zurück</string>
+    <string name="action_close">Schließen</string>
+    <string name="action_edit">Bearbeiten</string>
+
+    <!-- Kontotypen -->
+    <string name="account_type_cash">Bargeld</string>
+    <string name="account_type_checking">Girokonto</string>
+    <string name="account_type_credit_card">Kreditkarte</string>
+    <string name="account_type_savings">Sparkonto</string>
+    <string name="account_type_investment">Investitionen</string>
+    <string name="account_type_other">Sonstiges</string>
+
+    <!-- Mehr -->
+    <string name="more_accounts">Konten</string>
+    <string name="more_categories">Kategorien</string>
+    <string name="more_budgets">Budgets</string>
+    <string name="more_backup">Datensicherung</string>
+
+    <!-- Konten -->
+    <string name="accounts_title">Konten</string>
+    <string name="accounts_add">+ Konto hinzufügen</string>
+    <string name="account_delete_title">Konto löschen?</string>
+    <string name="account_delete_message">Konto „%1$s“ wird entfernt.</string>
+    <string name="account_new_title">Neues Konto</string>
+    <string name="account_edit_title">Konto bearbeiten</string>
+    <string name="account_name">Kontoname</string>
+    <string name="account_type">Kontotyp</string>
+    <string name="account_initial_balance">Anfangssaldo (%1$s)</string>
+    <string name="account_business">Geschäftskonto</string>
+    <string name="account_business_hint">Eingehende Zahlungen werden als Einnahmen gewertet (unabhängig vom Absender).</string>
+    <string name="account_loading">Wird geladen…</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome">Willkommen bei Heller</string>
+    <string name="onboarding_subtitle">Wähle eine Währung und erstelle dein erstes Konto – oder stelle Daten aus einer Sicherung wieder her.</string>
+    <string name="onboarding_currency">Währung</string>
+    <string name="onboarding_start">Starten</string>
+    <string name="onboarding_restore_hint">Hast du eine Sicherung? Stelle sie jetzt wieder her und überspringe das Anlegen eines neuen Kontos.</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_net_worth">Nettovermögen</string>
+    <string name="dashboard_expense_trend">Ausgabenverlauf</string>
+    <string name="dashboard_income_trend">Einnahmenverlauf</string>
+    <string name="dashboard_balance_trend">Saldoverlauf</string>
+    <string name="dashboard_top_expenses">Größte Ausgaben diesen Monat</string>
+    <string name="dashboard_upcoming">Anstehende Zahlungen</string>
+    <string name="dashboard_overdue">Überfällig</string>
+    <string name="dashboard_recent">Letzte Einträge</string>
+    <string name="dashboard_no_records">Noch keine Einträge. Füge den ersten mit + hinzu.</string>
+
+    <!-- Diagrammzeitraum -->
+    <string name="trend_30d">30 Tage</string>
+    <string name="trend_12w">12 Wochen</string>
+    <string name="trend_6m">6 Monate</string>
+    <string name="trend_1y">1 Jahr</string>
+
+    <!-- Gemeinsame Typen/Bezeichnungen -->
+    <string name="type_income">Einnahme</string>
+    <string name="type_expense">Ausgabe</string>
+    <string name="no_category">Keine Kategorie</string>
+    <string name="no_end">Kein Ende</string>
+
+    <!-- Häufigkeit -->
+    <string name="freq_daily">Täglich</string>
+    <string name="freq_weekly">Wöchentlich</string>
+    <string name="freq_monthly">Monatlich</string>
+    <string name="freq_quarterly">Vierteljährlich (4×/Jahr)</string>
+    <string name="freq_three_per_year">3×/Jahr</string>
+    <string name="freq_semiannual">Halbjährlich (2×/Jahr)</string>
+    <string name="freq_yearly">Jährlich</string>
+    <string name="freq_every_n_days">Alle %1$d Tage</string>
+    <string name="freq_every_n_weeks">Alle %1$d Wochen</string>
+    <string name="freq_every_n_months">Alle %1$d Monate</string>
+    <string name="freq_every_n_years">Alle %1$d Jahre</string>
+    <string name="freq_preset_weekly">Wöchentlich</string>
+    <string name="freq_preset_monthly">Monatlich</string>
+    <string name="freq_preset_quarterly">Vierteljährlich</string>
+    <string name="freq_preset_3x_year">3×/Jahr</string>
+    <string name="freq_preset_2x_year">2×/Jahr</string>
+    <string name="freq_preset_yearly">Jährlich</string>
+
+    <!-- Geplante Zahlungen -->
+    <string name="planned_title">Geplante Zahlungen</string>
+    <string name="planned_next_month">Nächster Monat — %1$s</string>
+    <string name="planned_will_pay">Du zahlst</string>
+    <string name="planned_will_receive">Du erhältst</string>
+    <string name="planned_empty">Noch keine geplanten Zahlungen. Füge die erste mit + hinzu.</string>
+    <string name="planned_next_prefix">Nächste %1$s</string>
+    <string name="planned_ended">Beendet</string>
+    <string name="planned_delete_title">Geplante Zahlung löschen?</string>
+    <string name="planned_detail_title">Geplante Zahlung</string>
+    <string name="planned_not_found">Zahlung nicht gefunden.</string>
+    <string name="planned_pay_now">Jetzt bezahlen</string>
+    <string name="planned_add_title">Neue Zahlung</string>
+    <string name="planned_edit_title">Zahlung bearbeiten</string>
+    <string name="planned_name_label">Name (z. B. Miete, Netflix)</string>
+    <string name="planned_start_label">Beginn (erste Zahlung)</string>
+    <string name="planned_end_label">Ende</string>
+    <string name="planned_clear_end">Ende entfernen</string>
+
+    <!-- Detailzeilen -->
+    <string name="detail_type">Typ</string>
+    <string name="detail_account">Konto</string>
+    <string name="detail_category">Kategorie</string>
+    <string name="detail_frequency">Häufigkeit</string>
+    <string name="detail_next">Nächste</string>
+    <string name="detail_end">Ende</string>
+    <string name="detail_note">Notiz</string>
+
+    <!-- Formularfelder -->
+    <string name="field_amount_currency">Betrag (%1$s)</string>
+    <string name="field_note">Notiz</string>
+    <string name="pick_account">Konto auswählen</string>
+
+    <!-- Zahlung verknüpfen -->
+    <string name="match_title">Zahlung verknüpfen</string>
+    <string name="match_due">Fällig %1$s</string>
+    <string name="match_hint">Wähle die Transaktion, die diese Zahlung beglichen hat. Die Zahlung verschwindet dann aus den anstehenden.</string>
+    <string name="match_empty">Auf diesem Konto gibt es noch keine Transaktionen zum Verknüpfen.</string>
+    <string name="record_default_payee">Zahlung</string>
+
+    <!-- Einträge -->
+    <string name="record_transfer">Umbuchung</string>
+    <string name="records_income">Einnahmen</string>
+    <string name="records_expenses">Ausgaben</string>
+    <string name="filter_label">Filter</string>
+    <string name="filter_all">Alle</string>
+    <string name="filter_clear">Filter zurücksetzen</string>
+    <string name="records_empty_title">Keine Einträge</string>
+    <string name="records_empty_sub">Einnahmen und Ausgaben erscheinen hier.</string>
+    <string name="records_empty_filter_title">Nichts entspricht dem Filter</string>
+    <string name="records_empty_filter_sub">Passe den Filter an oder setze ihn zurück.</string>
+    <string name="day_today">Heute</string>
+    <string name="day_yesterday">Gestern</string>
+
+    <!-- Eintragsdetail -->
+    <string name="record_detail_title">Eintragsdetails</string>
+    <string name="record_not_found">Eintrag nicht gefunden.</string>
+    <string name="detail_from_account">Von Konto</string>
+    <string name="detail_to_account">Auf Konto</string>
+    <string name="detail_date">Datum</string>
+    <string name="detail_payee">Empfänger</string>
+    <string name="record_delete_title">Eintrag löschen?</string>
+    <string name="record_delete_transfer_msg">Die Umbuchung wird inklusive beider Seiten gelöscht.</string>
+    <string name="record_delete_msg">Der Eintrag wird entfernt.</string>
+
+    <!-- Neuer/Eintrag bearbeiten -->
+    <string name="record_add_title">Neuer Eintrag</string>
+    <string name="record_edit_title">Eintrag bearbeiten</string>
+    <string name="record_all_synced_hint">Dein Konto synchronisiert sich von Fio – es wird automatisch von der Bank befüllt, daher können keine manuellen Einträge hinzugefügt werden (damit die Beträge mit deinem Online-Banking übereinstimmen). Für manuelle Einträge erstelle ein weiteres Konto, z. B. ein Bargeldkonto (Mehr → Konten).</string>
+    <string name="field_datetime">Datum und Uhrzeit</string>
+    <string name="action_next">Weiter</string>
+    <string name="time_title">Uhrzeit</string>
+    <string name="siblings_title">Auf alle gleichen anwenden?</string>
+    <string name="siblings_message">Du hast noch %1$d nicht kategorisierte Zahlungen von „%2$s“. Diese auch als „%3$s“ kategorisieren?</string>
+    <string name="siblings_apply">Auf alle anwenden</string>
+    <string name="siblings_skip">Nur diese</string>
+    <string name="siblings_this_category">diese Kategorie</string>
+
+    <!-- Statistik -->
+    <string name="this_month">Diesen Monat</string>
+    <string name="stats_balance">Saldo</string>
+    <string name="stats_cashflow">Cashflow</string>
+    <string name="stats_forecast">Prognose</string>
+    <string name="stats_forecast_sub">Ausgaben nächsten Monat</string>
+    <string name="month_prev">Vorheriger Monat</string>
+    <string name="month_next">Nächster Monat</string>
+    <string name="stats_no_expenses">Keine Ausgaben diesen Monat.</string>
+    <string name="stats_no_income">Keine Einnahmen diesen Monat.</string>
+    <string name="stats_category_hint">Tippe auf eine Kategorie für ihre Transaktionen.</string>
+
+    <!-- Kategorien (UI) -->
+    <string name="category_new">+ Neue Kategorie</string>
+    <string name="category_picker_title">Kategorie auswählen</string>
+    <string name="category_delete_title">Kategorie löschen?</string>
+    <string name="category_delete_with_children">„%1$s“ und ihre Unterkategorien werden gelöscht. Einträge bleiben, werden aber „Keine Kategorie“.</string>
+    <string name="category_delete_single">Kategorie „%1$s“ wird entfernt. Ihre Einträge bleiben als „Keine Kategorie“.</string>
+    <string name="category_add_title">Neue Kategorie</string>
+    <string name="category_edit_title">Kategorie bearbeiten</string>
+    <string name="category_name_label">Kategoriename (z. B. Urlaub)</string>
+    <string name="category_parent_label">Übergeordnete Kategorie (optional)</string>
+    <string name="category_parent_none">Keine (oberste Ebene)</string>
+    <string name="category_icon_label">Symbol</string>
+    <string name="category_default_name">Kategorie</string>
+
+    <!-- Kategorien (voreingestellte Namen) -->
+    <string name="cat_food">Essen &amp; Trinken</string>
+    <string name="cat_food_groceries">Lebensmittel</string>
+    <string name="cat_food_restaurant">Restaurants, Fast Food</string>
+    <string name="cat_food_bar">Bar, Café</string>
+    <string name="cat_shopping">Einkaufen</string>
+    <string name="cat_shopping_clothes">Kleidung &amp; Schuhe</string>
+    <string name="cat_shopping_jewelry">Schmuck, Accessoires</string>
+    <string name="cat_shopping_health_beauty">Gesundheit, Schönheit</string>
+    <string name="cat_shopping_kids">Kinder</string>
+    <string name="cat_shopping_home_garden">Haushalt, Garten</string>
+    <string name="cat_shopping_pets">Haustiere, Tiere</string>
+    <string name="cat_shopping_electronics">Elektronik, Zubehör</string>
+    <string name="cat_shopping_gifts">Geschenke, kleine Freuden</string>
+    <string name="cat_shopping_office_tools">Büro, Werkzeug</string>
+    <string name="cat_shopping_free_time">Freizeit</string>
+    <string name="cat_shopping_drugstore">Drogerie</string>
+    <string name="cat_housing">Wohnen</string>
+    <string name="cat_housing_rent">Miete</string>
+    <string name="cat_housing_mortgage">Hypothek</string>
+    <string name="cat_housing_utilities">Energie, Nebenkosten</string>
+    <string name="cat_housing_services">Dienstleistungen</string>
+    <string name="cat_housing_maintenance">Wartung, Reparaturen</string>
+    <string name="cat_housing_property_insurance">Sachversicherung</string>
+    <string name="cat_transport">Verkehr</string>
+    <string name="cat_transport_public">Öffentliche Verkehrsmittel</string>
+    <string name="cat_transport_taxi">Taxi</string>
+    <string name="cat_transport_long_distance">Fernverkehr</string>
+    <string name="cat_transport_business_trips">Geschäftsreisen</string>
+    <string name="cat_vehicle">Fahrzeug</string>
+    <string name="cat_vehicle_fuel">Kraftstoff</string>
+    <string name="cat_vehicle_parking">Parken</string>
+    <string name="cat_vehicle_maintenance">Fahrzeugwartung</string>
+    <string name="cat_vehicle_rental">Mietwagen</string>
+    <string name="cat_vehicle_vehicle_insurance">Kfz-Versicherung</string>
+    <string name="cat_vehicle_leasing">Leasing</string>
+    <string name="cat_life">Leben, Unterhaltung</string>
+    <string name="cat_life_healthcare">Gesundheit, Arzt</string>
+    <string name="cat_life_wellness">Wellness, Schönheit</string>
+    <string name="cat_life_sport">Aktiver Sport, Fitness</string>
+    <string name="cat_life_culture">Kultur, Sportveranstaltungen</string>
+    <string name="cat_life_life_events">Lebensereignisse</string>
+    <string name="cat_life_hobbies">Hobbys</string>
+    <string name="cat_life_education">Bildung, persönliche Entwicklung</string>
+    <string name="cat_life_books">Bücher, Audio, Abos</string>
+    <string name="cat_life_tv">TV, Streaming</string>
+    <string name="cat_life_holidays">Urlaub, Reisen, Hotels</string>
+    <string name="cat_life_charity">Wohltätigkeit, Spenden</string>
+    <string name="cat_comm">Kommunikation, PC</string>
+    <string name="cat_comm_phone">Telefon, Handy</string>
+    <string name="cat_comm_internet">Internet</string>
+    <string name="cat_comm_software">Software, Apps, Spiele</string>
+    <string name="cat_comm_postal">Postdienste</string>
+    <string name="cat_financial">Finanzielle Ausgaben</string>
+    <string name="cat_financial_taxes">Steuern</string>
+    <string name="cat_financial_insurance">Versicherung</string>
+    <string name="cat_financial_loans">Kredite, Raten</string>
+    <string name="cat_financial_fines">Bußgelder</string>
+    <string name="cat_financial_advisory">Beratung</string>
+    <string name="cat_financial_fees">Gebühren</string>
+    <string name="cat_financial_alimony">Unterhalt</string>
+    <string name="cat_investments">Investitionen</string>
+    <string name="cat_investments_realty">Immobilien</string>
+    <string name="cat_investments_movables">Fahrzeuge, bewegliches Vermögen</string>
+    <string name="cat_investments_financial">Finanzanlagen</string>
+    <string name="cat_investments_savings">Sparen</string>
+    <string name="cat_investments_collections">Sammlungen</string>
+    <string name="cat_income">Einnahmen</string>
+    <string name="cat_income_wage">Gehalt, Lohn, Rechnungen</string>
+    <string name="cat_income_interest">Zinsen, Dividenden</string>
+    <string name="cat_income_sale">Verkauf</string>
+    <string name="cat_income_rental">Mieteinnahmen</string>
+    <string name="cat_income_grants">Zuschüsse und Förderungen</string>
+    <string name="cat_income_lending">Einnahmen aus Verleih</string>
+    <string name="cat_income_coupons">Schecks, Gutscheine, Essensmarken</string>
+    <string name="cat_income_lottery">Lotterie, Glücksspiel</string>
+    <string name="cat_income_refunds">Erstattungen (Steuer, Kauf)</string>
+    <string name="cat_income_alimony">Unterhalt</string>
+    <string name="cat_income_gifts">Geschenke</string>
+    <string name="cat_others">Sonstiges</string>
+    <string name="cat_others_missing">Fehlend</string>
+    <string name="cat_work">Arbeit / Geschäft</string>
+    <string name="cat_cash_withdrawal">Bargeldabhebung</string>
+
+    <!-- Budgets -->
+    <string name="analytics_tab">Analysen</string>
+    <string name="budget_new">+ Neues Budget</string>
+    <string name="budgets_empty">Noch keine Budgets. Erstelle das erste und behalte deine Ausgaben im Blick.</string>
+    <string name="budget_delete_title">Budget löschen?</string>
+    <string name="budget_delete_message">Budget „%1$s“ wird entfernt.</string>
+    <string name="budget_over">Überschritten um %1$s</string>
+    <string name="budget_remaining">Verbleibend %1$s</string>
+    <string name="budget_add_title">Neues Budget</string>
+    <string name="budget_name_label">Budgetname</string>
+    <string name="budget_limit_label">Limit (%1$s)</string>
+    <string name="budget_period_label">Zeitraum</string>
+    <string name="budget_categories_label">Kategorien (leer = alle Ausgaben)</string>
+    <string name="budget_period_week">Woche</string>
+    <string name="budget_period_month">Monat</string>
+    <string name="budget_period_year">Jahr</string>
+
+    <!-- Analysen -->
+    <string name="analytics_net">Netto</string>
+    <string name="analytics_by_category">Ausgaben nach Kategorie</string>
+    <string name="analytics_cashflow">Cashflow (6 Monate)</string>
+    <string name="analytics_cashflow_legend">Oberer Balken = Einnahmen, unterer = Ausgaben.</string>
+
+    <!-- Wiederkehrende Zahlungen -->
+    <string name="recurring_title">Wiederkehrende Zahlungen</string>
+    <string name="recurring_empty">Keine wiederkehrenden Zahlungen gefunden. Synchronisiere zuerst Transaktionen von Fio.</string>
+    <string name="recurring_hint">Diese Zahlungen wiederholen sich jeden Monat. Wähle aus, welche zu den geplanten Zahlungen hinzugefügt werden sollen.</string>
+    <string name="recurring_monthly_prefix">monatlich · %1$s</string>
+    <string name="recurring_add_selected">Ausgewählte hinzufügen (%1$d)</string>
+    <string name="recurring_note_from_fio">Von Fio (geschätzt aus dem Verlauf)</string>
+
+    <!-- Fio-Verbindung -->
+    <string name="fio_section_title">Fio-Verbindung</string>
+    <string name="fio_connect_hint">Gib einen Read-only-Fio-Token ein und dieses Konto wird automatisch mit Banktransaktionen befüllt. Erstelle den Token im Fio-Internetbanking: Einstellungen → API → Neuen Token hinzufügen → „Nur Kontoüberwachung“. Er ist schreibgeschützt – du kannst damit keine Zahlung senden.</string>
+    <string name="fio_token_label">Fio-Token</string>
+    <string name="fio_syncing">Synchronisiere…</string>
+    <string name="fio_connect_sync">Verbinden und synchronisieren</string>
+    <string name="fio_connected">Mit Fio verbunden. Synchronisiert sich automatisch täglich im Hintergrund. Zuletzt: %1$s.</string>
+    <string name="fio_never">noch nie</string>
+    <string name="fio_find_recurring">Wiederkehrende Zahlungen finden (Daueraufträge)</string>
+    <string name="fio_disconnect">Von Fio trennen</string>
+    <string name="fio_downloading">Lade Transaktionen von Fio…</string>
+    <string name="fio_disconnect_title">Von Fio trennen?</string>
+    <string name="fio_disconnect_message">Dieses Konto wird nicht mehr automatisch von Fio synchronisiert. Importierte Einträge bleiben. Zum erneuten Verbinden gib den Token wieder ein.</string>
+    <string name="fio_disconnect_confirm">Trennen</string>
+    <string name="fio_recurring_title">Wiederkehrende Zahlungen</string>
+    <string name="fio_recurring_message">Ich habe %1$d Zahlungen gefunden, die sich jeden Monat wiederholen (Daueraufträge / Abos). Zu den geplanten Zahlungen hinzufügen?</string>
+    <string name="fio_recurring_manual">Lieber manuell auswählen</string>
+    <string name="fio_recurring_yes">Ja, hinzufügen</string>
+    <string name="action_no">Nein</string>
+    <string name="fio_error_missing_token">Fio-Token fehlt.</string>
+    <string name="fio_error_invalid_token">Ungültiger Token (HTTP 404). Prüfe, ob er korrekt kopiert wurde.</string>
+    <string name="fio_error_422">Für Daten älter als 90 Tage entsperre den Token im Fio-Internetbanking: Einstellungen → API → Schloss-Symbol neben dem Token → bestätigen (SMS/App). Dann innerhalb von 10 Minuten erneut synchronisieren.</string>
+    <string name="fio_error_http">Fio hat die Anfrage abgelehnt (HTTP %1$d).</string>
+    <string name="fio_error_network">Netzwerkfehler: %1$s</string>
+    <string name="fio_error_parse">Daten von Fio konnten nicht gelesen werden.</string>
+    <string name="fio_sync_success">Fertig: %1$d von %2$d Transaktionen neu hinzugefügt, %3$d kategorisiert.</string>
+    <string name="fio_rate_limited">Fio erlaubt nur 1 Anfrage pro 30 s. Versuche es gleich noch einmal.</string>
+    <string name="fio_added_planned">%1$d geplante Zahlungen hinzugefügt.</string>
+
+    <!-- Sicherung -->
+    <string name="backup_error_open_target">Sicherungsziel konnte nicht geöffnet werden.</string>
+    <string name="backup_error_open_backup">Sicherung konnte nicht geöffnet werden.</string>
+    <string name="backup_error_invalid">Die Datei ist keine gültige Heller-Sicherung.</string>
+    <string name="backup_in_progress">Sichere…</string>
+    <string name="backup_done">Sicherung gespeichert.</string>
+    <string name="backup_failed">Sicherung fehlgeschlagen: %1$s</string>
+    <string name="restore_in_progress">Stelle wieder her…</string>
+    <string name="restore_failed">Wiederherstellung fehlgeschlagen: %1$s</string>
+    <string name="backup_intro">Die App ist offline – die Daten liegen nur auf deinem Telefon. Sichere sie in einer Datei (in Dateien, auf einem Laufwerk usw.). Die Wiederherstellung liest die Datei zurück und überschreibt die aktuellen Daten.</string>
+    <string name="backup_action">Daten sichern</string>
+    <string name="restore_action">Aus Sicherung wiederherstellen</string>
+    <string name="restore_confirm_title">Aus Sicherung wiederherstellen?</string>
+    <string name="restore_confirm_message">Dadurch werden alle aktuellen Daten überschrieben und die App startet neu.</string>
+    <string name="restore_confirm_yes">Wiederherstellen</string>
+
+    <!-- Standardnamen -->
+    <string name="account_default_name">Konto</string>
+    <string name="budget_default_name">Budget</string>
+</resources>

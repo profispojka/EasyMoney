@@ -15,11 +15,11 @@ object Money {
     private val LOCALE: Locale = Locale.forLanguageTag("cs-CZ")
     private const val MINUS = "−" // typografické minus
 
-    /** Symbol zvolené měny (Kč/€/zł/$). Nastavuje se při startu z nastavení (viz [applyCurrency]). */
+    /** Symbol zvolené měny (Kč/€/$/£/CHF…). Nastavuje se při startu z nastavení (viz [applyCurrency]). */
     @Volatile
     var currencySymbol: String = AppCurrency.CZK.symbol
 
-    /** Nastaví zvolenou měnu podle kódu (CZK/EUR/PLN/USD). */
+    /** Nastaví zvolenou měnu podle kódu (viz [AppCurrency]). */
     fun applyCurrency(code: String?) {
         currencySymbol = AppCurrency.fromCode(code).symbol
     }

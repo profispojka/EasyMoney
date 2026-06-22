@@ -59,6 +59,7 @@
     <string name="dashboard_expense_trend">Trend wydatków</string>
     <string name="dashboard_income_trend">Trend przychodów</string>
     <string name="dashboard_balance_trend">Trend salda</string>
+    <string name="dashboard_top_expenses">Największe wydatki w tym miesiącu</string>
     <string name="dashboard_upcoming">Nadchodzące płatności</string>
     <string name="dashboard_overdue">Po terminie</string>
     <string name="dashboard_recent">Ostatnie transakcje</string>
